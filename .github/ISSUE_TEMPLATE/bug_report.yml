@@ -1,0 +1,37 @@
+name: Bug report
+description: Something didn't work while levelling
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. A bug report from **Tools > Bug report** in the app helps most: it's redacted (no screenshots, names or paths).
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what did XynLevel do instead?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: XynLevel version
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: display
+    attributes:
+      label: Display size and Windows version
+      placeholder: "2560 x 1440, Windows 11"
+  - type: input
+    id: character
+    attributes:
+      label: Race, level and attack
+      placeholder: "Saiyan, level 300, 4x Kamehameha in slot 7"
+  - type: textarea
+    id: report
+    attributes:
+      label: Bug report
+      description: Drag the ZIP from Tools > Bug report here, or paste the steps to reproduce.

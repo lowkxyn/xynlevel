@@ -1,0 +1,47 @@
+/* Native-sized hit targets retain the promo's idle titlebar proportions. */
+.xyn-app .titlebar-controls{align-items:stretch;opacity:1!important}
+.xyn-app .titlebar .titlebar-controls .tb-btn{min-width:40px;height:100%!important;border-radius:0}
+.xyn-app .titlebar-controls .tb-btn svg{opacity:.65;transition:opacity .15s}
+.xyn-app .titlebar-controls .tb-btn:hover svg{opacity:1}
+.xyn-app .titlebar .titlebar-controls .tb-close:hover,#mini-close:hover{background:#e81123;color:#fff}
+.xyn-app .titlebar .titlebar-controls .tb-close:active,#mini-close:active{background:#c50f1f;color:#fff}
+.xyn-app .titlebar-controls .tb-btn:not(.tb-close):active{background:var(--bg-hover)}
+#maximize .restore-icon{display:none}
+#maximize[data-maximized=true] .maximize-icon{display:none}
+#maximize[data-maximized=true] .restore-icon{display:block}
+.xyn-app.maximized,.xyn-app.maximized .titlebar{border-radius:0!important}
+.telem-value,.stat-value,#mini-counters,#mini-time,.level-percent{font-variant-numeric:tabular-nums}
+.mini-counter + .mini-counter::before{content:' \00b7 '}
+.mini-counter output{font:inherit}
+.xyn-app .titlebar,.compact-hud{user-select:none}
+.xyn-app.compact{height:100vh}
+.xyn-app.compact #mini{height:100%;flex:1}
+/* Telemetry transforms carry data, so reduced motion must preserve their values
+   even under the older global :hover/:active transform reset. */
+.xyn-app.reduced-motion :is(.stat-bar-fill,#mini-progress):is(:hover,:active){transform:scaleX(var(--progress,0))!important}
+@media(prefers-reduced-motion:reduce){
+  .xyn-app .dock-key{scale:1!important}
+  .xyn-app :is(.stat-bar-fill,#mini-progress):is(:hover,:active){transform:scaleX(var(--progress,0))!important}
+}
+.xyn-app.reduced-motion .dock-key{scale:1!important}
+
+/* Keycaps jump up on hover, so the element slides away from a cursor resting near its bottom edge and
+   the click misses. A still, larger hit area under each key (it covers the gaps too) keeps clicks landing. */
+[data-nav-style=keycap] .dock-key::before{content:'';position:absolute;inset:-8px -7px -12px}
+[data-nav-style=keycap] .dock-key:hover::before{bottom:-16px}
+[data-nav-style=keycap] .dock-key[aria-current=page]::before{bottom:-26px}
+.titlebar-controls .tb-ontop[aria-pressed=true]{color:var(--accent-readable,var(--accent))}
+.titlebar-controls .tb-ontop[aria-pressed=true] svg{opacity:1}
+.run-status{margin:12px 6px 18px;text-align:center;min-height:1.3em;font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Title bar shows the real XL mark, not a placeholder diamond. */
+.xyn-app .titlebar .titlebar-title::before{content:'';width:16px!important;height:16px!important;flex:none;border-radius:0!important;transform:none!important;box-shadow:none!important;opacity:.95;background:linear-gradient(135deg,var(--grad-from,#fff),var(--grad-to,#fff))!important;-webkit-mask:var(--logo) center/contain no-repeat;mask:var(--logo) center/contain no-repeat}
+/* Glass: the Start/Stop card was drawn as the bottom half of a header card that no longer exists. */
+[data-ui="aero"] #run .action-bar{padding:20px 24px;border-top:1px solid rgba(255,255,255,.09);border-radius:18px;margin-top:6px}
+.xyn-app .titlebar-title{display:flex;align-items:center;gap:8px}
+/* While running, F6 stops, so the badge belongs to Stop, not the disabled Running button. */
+.xyn-app[data-running=true] .run-kbd{display:none!important}
+/* Don't stretch an empty framed panel to the bottom of a maximised window. */
+.xyn-app[data-theme=dark][data-ui=classic] .run-panel{flex:none}
+/* The XL is always brushed silver, like XynMacro's X; accents colour the UI, not the logo. */
+.xyn-app .brand-mark,.xyn-app .titlebar .titlebar-title::before{background:linear-gradient(160deg,#ffffff 0%,#d9dde4 30%,#9aa1ad 62%,#6b7280 100%)!important}
+.xyn-app[data-theme=light] .brand-mark,.xyn-app[data-theme=light] .titlebar .titlebar-title::before{background:linear-gradient(160deg,#55555f,#8a909b)!important}

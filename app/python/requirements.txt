@@ -1,0 +1,14 @@
+# Exact versions the released build was made with. Change one on purpose, then rebuild and retest.
+mss==10.2.0
+numpy==2.4.4
+opencv-python==4.13.0.92
+pydirectinput==1.0.4
+pynput==1.8.1
+pyinstaller==6.21.0
+winrt-runtime==3.2.1
+winrt-Windows.Foundation==3.2.1
+winrt-Windows.Foundation.Collections==3.2.1
+winrt-Windows.Globalization==3.2.1
+winrt-Windows.Graphics.Imaging==3.2.1
+winrt-Windows.Media.Ocr==3.2.1
+winrt-Windows.Storage.Streams==3.2.1

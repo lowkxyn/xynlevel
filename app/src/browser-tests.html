@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>XynLevel browser unit tests</title>
+<style>body{font:15px system-ui;background:#0d0d10;color:#e2e3e7;margin:32px}li{padding:8px}.pass{color:#7eb39a}.fail{color:#ef9999}</style>
+<h1>Frontend unit tests</h1><p>Runs the same test modules with browser assertion adapters when Bun and Node are unavailable.</p>
+<ol id="results"></ol><p id="summary">Loading...</p>
+<script type="importmap">{"imports":{"node:test":"./browser-test-adapter.js","node:assert/strict":"./browser-test-adapter.js"}}</script>
+<script type="module">
+import './settings.test.mjs';
+import './format.test.mjs';
+import './run-state.test.mjs';
+const failures = document.querySelectorAll('.fail').length;
+document.getElementById('summary').textContent = `${document.querySelectorAll('#results li').length - failures} passed; ${failures} failed.`;
+</script></html>

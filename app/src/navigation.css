@@ -1,0 +1,86 @@
+/* Recessed keycap tray and dial wheel, sharing the app's surface tokens. */
+.xyn-app{
+  --dock-light:255,255,255;--dock-ink:#fff;--dock-shadow:rgba(0,0,0,.75);
+  --dock-tray:color-mix(in srgb,var(--bg-nav) 88%,#000);
+  --dock-key-top:color-mix(in srgb,var(--bg-input) 85%,#fff);
+  --dock-key-bottom:var(--bg-alt);
+}
+.xyn-app[data-theme=light]{
+  --dock-light:55,68,88;--dock-ink:#263346;--dock-shadow:rgba(35,48,68,.22);
+  --dock-tray:#d6dde6;--dock-key-top:#fff;--dock-key-bottom:#edf1f6;
+}
+.xyn-app .app-shell{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;column-gap:0}
+.navigation-header{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:16px;padding:28px 32px 10px;position:relative;z-index:3}
+.dock-brand{display:flex;gap:8px;align-items:center;min-width:0}
+.dock-brand .brand-mark{width:30px;height:30px;animation:none;transition:none;transform:none}
+.dock-brand .brand-info{display:flex}
+.dock-meta{justify-self:end;display:flex;flex-direction:column;gap:6px;align-items:flex-end;min-width:0}
+.xyn-app .dock-meta .status-pill{padding:6px 10px;white-space:nowrap;border:1px solid var(--border-light);background:var(--bg-card)}
+.xyn-app .dock-meta .status-pill span:not(.status-dot){display:inline}
+.dock-credit{font-size:10px;color:var(--text3);padding-right:3px}
+.navigation-dock{display:flex;gap:12px;padding:10px 14px;position:relative;isolation:isolate;border-radius:22px;background:var(--dock-tray);width:376px;height:66px;flex:none;
+  box-shadow:inset 0 3px 8px var(--dock-shadow),inset 0 -1px 0 rgba(var(--dock-light),.04),0 0 0 1px var(--border);}
+.dock-key{width:60px;height:46px;flex:none;display:grid;place-items:center;position:relative;border:1px solid var(--border);border-radius:14px;background:linear-gradient(var(--bg-input),var(--bg-alt));color:var(--text3);text-decoration:none;outline-offset:4px;cursor:pointer;
+  transition:transform .22s cubic-bezier(.2,1.45,.45,1),scale .16s cubic-bezier(.2,.9,.3,1),color .2s ease,background .2s ease,border-color .2s ease}
+.dock-key .nav-icon{display:grid;place-items:center;width:24px;height:24px;background:none;border:0;box-shadow:none;border-radius:0}
+.dock-key svg{width:20px;height:20px;stroke:currentColor;transition:filter .3s}
+.dock-key .nav-label{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.dock-key:hover{color:var(--text);transform:translateY(-4px)}
+.dock-key:active{scale:.95}
+.dock-key[aria-current=page]{color:var(--dock-ink);transform:translateY(-16px) scale(1.18);background:linear-gradient(var(--dock-key-top),var(--dock-key-bottom));border-color:rgba(var(--dock-light),.32);
+  box-shadow:0 14px 26px var(--dock-shadow),0 0 26px rgba(var(--dock-light),.20),inset 0 1px 0 rgba(var(--dock-light),.30)}
+.dock-key[aria-current=page] svg{filter:drop-shadow(0 0 6px rgba(var(--dock-light),.8))}
+.dock-key[aria-current=page]::after{content:'';position:absolute;left:8%;right:8%;bottom:-14px;height:10px;border-radius:50%;background:radial-gradient(ellipse,rgba(var(--dock-light),.45),transparent 70%);filter:blur(4px);pointer-events:none}
+.dock-pip{position:absolute;bottom:3px;height:3px;width:22px;border-radius:999px;background:var(--dock-ink);box-shadow:0 0 10px rgba(var(--dock-light),.9),0 0 2px var(--dock-ink);pointer-events:none;transition:transform .22s cubic-bezier(.2,1.2,.4,1)}
+.dial-rail,.dial-notch{display:none}
+.xyn-app .main{min-height:0;min-width:0}
+.xyn-app .view{padding:8px 32px 36px}
+.xyn-app .page-header,.xyn-app #run .page-header{margin:0 0 22px;padding:8px 0 16px;text-align:center;border:0;border-bottom:1px solid var(--border);border-radius:0;background:none;box-shadow:none;backdrop-filter:none}
+.xyn-app .page-header h1{font-size:21px;font-weight:600;letter-spacing:.05em;background:none;-webkit-text-fill-color:currentColor;color:var(--text);margin-bottom:3px}
+.xyn-app .page-header p{font-size:12px;color:var(--text3)}
+
+[data-nav-style=dial] .navigation-header{padding-top:14px}
+[data-nav-style=dial] .navigation-dock{width:344px;height:92px;padding:0;border-radius:18px;overflow:hidden;cursor:ew-resize;box-shadow:inset 0 1px 0 rgba(var(--dock-light),.05),inset 0 0 0 1px var(--border),inset 0 10px 30px var(--dock-shadow)}
+[data-nav-style=dial] .navigation-dock::before,[data-nav-style=dial] .navigation-dock::after{content:'';position:absolute;top:0;bottom:0;width:54px;pointer-events:none;z-index:12}
+[data-nav-style=dial] .navigation-dock::before{left:0;background:linear-gradient(90deg,var(--dock-tray),transparent)}
+[data-nav-style=dial] .navigation-dock::after{right:0;background:linear-gradient(-90deg,var(--dock-tray),transparent)}
+[data-nav-style=dial] .dock-key{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-32px 0 0 -28px;border-radius:50%;background:transparent;border-color:transparent;transition:color .2s,scale .16s,background .2s,border-color .2s}
+[data-nav-style=dial] .dock-key[aria-current=page]{color:var(--dock-ink);background:linear-gradient(var(--dock-key-top),var(--dock-key-bottom));border-color:rgba(var(--dock-light),.45);box-shadow:0 0 0 4px rgba(var(--dock-light),.05),0 0 34px rgba(var(--dock-light),.25),inset 0 0 14px rgba(var(--dock-light),.08)}
+[data-nav-style=dial] .dock-key[aria-current=page]::after{bottom:-10px}
+[data-nav-style=dial] .dock-key svg{width:22px;height:22px}
+[data-nav-style=dial] .dial-rail{display:block;position:absolute;left:-400px;right:-400px;bottom:10px;height:8px;pointer-events:none;background:repeating-linear-gradient(90deg,rgba(var(--dock-light),.38) 0 1px,transparent 1px 14px);will-change:transform}
+[data-nav-style=dial] .dial-notch{display:block;position:absolute;left:calc(50% - 1px);width:2px;height:8px;top:0;border-radius:0 0 2px 2px;background:var(--dock-ink);box-shadow:0 0 8px rgba(var(--dock-light),.9);z-index:13}
+[data-nav-style=dial] .dock-pip{bottom:3px;z-index:13;transition:none}
+.navigation-dock:focus-within{outline:1px solid var(--border-input);outline-offset:4px}
+.dock-key:focus-visible{outline:2px solid var(--accent-text);outline-offset:3px}
+
+.nav-style-grid{grid-template-columns:repeat(2,minmax(0,1fr));padding-top:0}
+.nav-style-preview{height:62px;display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 12px 0;border-radius:12px;background:var(--bg-nav);box-shadow:inset 0 2px 8px var(--dock-shadow)}
+.nav-style-preview i{width:22px;height:22px;border:1px solid var(--border-input);border-radius:6px;background:var(--bg-input)}
+.preview-keycap i:nth-child(2){transform:translateY(-6px);background:var(--bg-hover);box-shadow:0 0 12px rgba(var(--dock-light),.25);border-color:var(--text3)}
+.preview-dial{background:repeating-linear-gradient(90deg,var(--border-input) 0 1px,transparent 1px 10px) center bottom 7px / 100% 5px no-repeat,var(--bg-nav)}
+.preview-dial i{border-radius:50%;width:28px;height:28px;opacity:.4}
+.preview-dial i:nth-child(2){opacity:1;transform:scale(1.2);border-color:var(--text3);box-shadow:0 0 14px rgba(var(--dock-light),.25)}
+[data-theme=light] .nav-style-grid .theme-card{background:var(--bg-input)}
+[data-theme=light] .dock-key[aria-current=page] svg{filter:none}
+/* The dial uses transforms for placement, so reduced motion must keep their final values. */
+.xyn-app.reduced-motion[data-nav-style=keycap] .dock-key[aria-current=page]:hover,.xyn-app.reduced-motion[data-nav-style=keycap] .dock-key[aria-current=page]:active{transform:translateY(-16px) scale(1.18)!important}
+.xyn-app.reduced-motion[data-nav-style=dial] .dock-key:hover,.xyn-app.reduced-motion[data-nav-style=dial] .dock-key:active{transform:var(--dial-position)!important}
+@media(prefers-reduced-motion:reduce){
+  .xyn-app[data-nav-style=keycap] .dock-key[aria-current=page]:hover,.xyn-app[data-nav-style=keycap] .dock-key[aria-current=page]:active{transform:translateY(-16px) scale(1.18)!important}
+  .xyn-app[data-nav-style=dial] .dock-key:hover,.xyn-app[data-nav-style=dial] .dock-key:active{transform:var(--dial-position)!important}
+}
+@media(max-width:760px){
+  .navigation-header{padding-left:20px;padding-right:20px;gap:10px}
+  .dock-brand{gap:3px}.dock-brand .brand-mark{width:22px;height:22px}
+  .xyn-app .dock-meta .status-pill{font-size:10px;padding:5px 7px;gap:6px}
+  .xyn-app .view{padding-left:22px;padding-right:22px}
+  [data-nav-style=dial] .navigation-dock{width:304px}
+}
+@media(max-width:620px){
+  .navigation-header{grid-template-columns:1fr 1fr;padding-top:10px;row-gap:24px}
+  .navigation-dock{grid-column:1/-1;grid-row:2;justify-self:center}
+  .dock-meta{grid-column:2;grid-row:1;flex-direction:row;align-items:center}
+  .dock-brand .brand-info{display:flex}.dock-credit{display:block}
+  .dock-key .nav-label{display:block}
+}

@@ -1,0 +1,34 @@
+[package]
+name = "xynlevel"
+version = "1.0.0"
+description = "XynLevel Gravity Chamber levelling macro desktop shell"
+authors = ["Xyn"]
+edition = "2021"
+
+[lib]
+name = "xynlevel_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2.11.6", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json"] }
+getrandom = "0.3"
+tauri-plugin-single-instance = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-updater = { version = "=2.10.1", optional = true }
+
+[features]
+default = []
+# Plumbing only. Endpoints and key must be reviewed before enabling.
+updater = ["dep:tauri-plugin-updater"]
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true

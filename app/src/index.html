@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="dark light" name="color-scheme"/><title>XynLevel</title><link href="assets/logo.png" rel="icon"/><link href="assets/fonts.css" rel="stylesheet"/><link href="styles.css" rel="stylesheet"/><link href="navigation.css" rel="stylesheet"/><link href="steel.css" rel="stylesheet"/><link href="promo.css" rel="stylesheet"/><link href="experience.css" rel="stylesheet"/><script src="main.js" type="module"></script></head>
+<body>
+<div class="window-frame xyn-app" data-nav-style="keycap" data-theme="dark" id="app">
+<div class="titlebar" data-tauri-drag-region="">
+<div class="titlebar-drag" data-tauri-drag-region=""><span class="titlebar-title">XynLevel</span></div>
+<div class="titlebar-controls">
+<button aria-label="Stay on top" aria-pressed="false" class="tb-btn tb-ontop" id="pin-toggle" title="Keep XynLevel above other windows"><svg fill="none" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="12"><line x1="12" x2="12" y1="17" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg><span hidden="" id="pin-indicator"></span></button>
+<button aria-label="Roll up" class="tb-btn tb-compact" id="compact" title="Roll up into a small bar"><svg fill="none" height="10" stroke="currentColor" stroke-width="1.5" viewbox="0 0 10 10" width="10"><line x1="1" x2="9" y1="8" y2="8"></line><polyline points="3 5 5 3 7 5"></polyline></svg></button>
+<button aria-label="Minimize" class="tb-btn tb-minimize" id="minimize" title="Minimize"><svg height="1" viewbox="0 0 10 1" width="10"><rect fill="currentColor" height="1" width="10"></rect></svg></button>
+<button aria-label="Maximize" class="tb-btn tb-maximize" id="maximize" title="Maximize"><svg class="maximize-icon" fill="none" height="10" stroke="currentColor" stroke-width="1" viewbox="0 0 10 10" width="10"><rect height="9" width="9" x=".5" y=".5"></rect></svg><svg class="restore-icon" fill="none" height="10" stroke="currentColor" stroke-width="1" viewBox="0 0 10 10" width="10"><path d="M3 2V.5h6.5V7H8M.5 3h6.5v6.5H.5z"></path></svg></button>
+<button aria-label="Close" class="tb-btn tb-close" id="close" title="Close"><svg height="10" stroke="currentColor" stroke-width="1.2" viewbox="0 0 10 10" width="10"><line x1="1" x2="9" y1="1" y2="9"></line><line x1="9" x2="1" y1="1" y2="9"></line></svg></button>
+</div>
+</div>
+<div class="app-shell">
+<header class="navigation-header">
+<div class="dock-brand">
+<div class="brand-mark"></div>
+<div class="brand-info"><span class="brand-name">XynLevel</span><span class="brand-ver" id="version">1.0.0</span></div>
+</div>
+<nav aria-label="Pages" class="navigation-dock" id="navigation-dock">
+<span aria-hidden="true" class="dial-rail"></span>
+<span aria-hidden="true" class="dial-notch"></span>
+<a aria-label="Run" class="dock-key" href="#run"><span class="nav-icon"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg></span><span class="nav-label">Run</span></a>
+<a aria-label="Settings" class="dock-key" href="#settings"><span class="nav-icon"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><line x1="4" x2="4" y1="21" y2="14"></line><line x1="4" x2="4" y1="10" y2="3"></line><line x1="12" x2="12" y1="21" y2="12"></line><line x1="12" x2="12" y1="8" y2="3"></line><line x1="20" x2="20" y1="21" y2="16"></line><line x1="20" x2="20" y1="12" y2="3"></line><line x1="1" x2="7" y1="14" y2="14"></line><line x1="9" x2="15" y1="8" y2="8"></line><line x1="17" x2="23" y1="16" y2="16"></line></svg></span><span class="nav-label">Settings</span></a>
+<a aria-label="Window" class="dock-key" href="#window"><span class="nav-icon"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><rect height="16" rx="2" width="20" x="2" y="4"></rect><path d="M2 9h20"></path></svg></span><span class="nav-label">Window</span></a>
+<a aria-label="Tools" class="dock-key" href="#tools"><span class="nav-icon"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" x2="20" y1="19" y2="19"></line></svg></span><span class="nav-label">Tools</span></a>
+<a aria-label="Stats" class="dock-key" href="#stats"><span class="nav-icon"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16"><path d="M4 20V10M10 20V4M16 20v-7M22 20V8"></path></svg></span><span class="nav-label">Stats</span></a>
+<span aria-hidden="true" class="dock-pip"></span>
+</nav>
+<div class="dock-meta">
+<div class="status-pill"><span class="status-dot" id="bridge-dot"></span><span id="bridge-status">Connecting</span></div>
+<div class="dock-credit">made by Xyn</div>
+</div>
+</header>
+<main class="main" id="main-content"><div class="main-inner xyn-main">
+<section class="page view" data-hero="" id="run">
+<div class="page-header">
+<h1>Run</h1>
+<p>Gravity Chamber levelling automation for DBOG</p>
+<a class="dial-neighbour dial-next" href="#settings">Settings &#8250;</a>
+</div>
+<div class="action-bar">
+<button class="btn-start" id="run-button"><span id="run-button-label">Start run</span><span aria-hidden="true" class="kbd run-kbd">F6</span></button>
+<button aria-label="Stop" class="btn-stop" disabled="" id="stop-button"><span aria-hidden="true" class="stop-dot"></span><span class="stop-label">Stop</span><span aria-hidden="true" class="dial-state dial-idle">Idle</span><span aria-hidden="true" class="dial-state dial-running">Running</span></button>
+</div>
+<p aria-live="polite" class="run-status" id="status" role="status">Connecting...</p>
+<div class="run-panel">
+<div class="stat-row stat-row-3">
+<div class="stat-card"><div class="stat-label">GC time left</div><output class="stat-value" id="time-left">--:--</output><div aria-label="Time left unavailable" class="stat-bar" id="gauge" role="img"><div class="stat-bar-fill" id="time-progress"></div></div></div>
+<div class="stat-card"><div class="stat-label">Run time</div><output class="stat-value" data-stat="elapsed" id="run-time">--:--</output><div class="run-subline" id="run-time-state">press Start run</div></div>
+<div class="stat-card level-card"><div class="stat-label">Level</div><div class="level-line"><output class="stat-value" id="run-level">--</output><span class="level-percent" id="run-level-percent">Reads during the run</span></div><div aria-label="Level progress unavailable" class="stat-bar empty" id="level-gauge" role="img"><div class="stat-bar-fill" id="level-progress"></div></div></div>
+</div>
+<div class="section-title">Run stats</div>
+<div class="panel panel-static">
+<div class="telemetry"><div aria-label="Reported run statistics" class="telem-row" hidden="" id="run-stats"></div><div id="stats-empty" aria-label="No run statistics reported"><div class="telem-card"><div class="telem-label">Ults fired</div><span class="telem-value">&mdash;</span><span class="telem-sub">no run yet</span></div><div class="telem-card"><div class="telem-label">Deaths</div><span class="telem-value">&mdash;</span><span class="telem-sub">no run yet</span></div><div class="telem-card"><div class="telem-label">Ki blasts</div><span class="telem-value">&mdash;</span><span class="telem-sub">no run yet</span></div></div><div class="telem-card gravity-card"><div class="telem-label">Gravity</div><div class="gravity-value-row"><output class="telem-value" id="run-gravity">100G</output><a aria-label="Edit gravity" class="gravity-edit" data-open-setting="gravity" href="#settings">Edit</a></div><div class="telem-sub" id="run-gravity-hint">set at start</div></div></div>
+</div>
+<div id="level-up" role="status">LEVEL UP</div></div></section>
+<section class="page view" hidden="" id="settings">
+<div class="page-header">
+<div>
+<h1>Settings</h1>
+<p>Automatically saved. Macro changes apply to your next run.</p>
+<a class="dial-neighbour dial-prev" href="#run">&#8249; Run</a><a class="dial-neighbour dial-next" href="#window">Window &#8250;</a>
+</div>
+</div>
+<div class="warning" hidden="" id="settings-warning" role="alert">
+</div>
+<div aria-label="Settings sections" class="section-nav" role="group">
+<button class="btn-sm" data-section="attack">Attack</button>
+<button class="btn-sm" data-section="movement">Movement</button>
+<button class="btn-sm" data-section="chamber">Chamber</button>
+<button class="btn-sm" data-section="stopping">Stopping</button>
+<button class="btn-sm" data-section="appearance">Appearance</button>
+<button class="btn-sm" data-section="notifications">Notifications</button>
+</div>
+<section class="settings-section" id="section-attack" tabindex="-1">
+<h2 class="section-title">Attack</h2>
+<div class="panel">
+<div class="row-item">
+<label class="row-label" for="attack" id="attack-label">Attack mode
+</label>
+
+<div class="row-ctrl"><select class="inp" data-segmented="" data-setting="" id="attack">
+<option value="auto">Auto</option>
+<option value="blasts">Blasts</option>
+<option value="ult">Ult</option>
+</select></div></div><div class="row-hint">Auto uses your ult when available, otherwise Ki blasts.</div>
+<div class="row-item">
+<label class="row-label" for="ult_slot" id="ult_slot-label">Ult slot
+</label>
+
+<div class="row-ctrl"><select class="inp" data-segmented="" data-setting="" id="ult_slot">
+<option value="7">7</option>
+<option value="8">8</option>
+</select></div></div><div class="row-hint">Choose an ult that hits the room.</div>
+<div class="row-item">
+<label class="row-label" for="blast_interval" id="blast_interval-label">Blast interval
+</label>
+
+<div class="row-ctrl"><div class="xyn-controls interval">
+<input aria-label="Blast interval slider" class="setting-slider" data-range-for="blast_interval" max="2" min="0.05" step="0.05" type="range"/>
+<div class="number-unit">
+<input class="inp" data-setting="" id="blast_interval" max="60" min="0.05" step="0.05" type="number"/>
+<span>s</span>
+</div>
+</div></div></div><div class="row-hint">Time between Ki blasts. Up to 60 s in the number field.</div>
+<div class="row-item">
+<label class="row-label" for="scroll_interval" id="scroll_interval-label">Scroll interval
+</label>
+
+<div class="row-ctrl"><div class="xyn-controls interval">
+<input aria-label="Scroll interval slider" class="setting-slider" data-range-for="scroll_interval" max="2" min="0.05" step="0.05" type="range"/>
+<div class="number-unit">
+<input class="inp" data-setting="" id="scroll_interval" max="60" min="0.05" step="0.05" type="number"/>
+<span>s</span>
+</div>
+</div></div></div><div class="row-hint">Time between target switches. Up to 60 s in the number field.</div>
+<div class="row-item">
+<label class="row-label" for="ult_jump" id="ult_jump-label">Jump when firing ults
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="ult_jump" role="switch" type="checkbox"/></div></div><div class="row-hint">Run, hop and fire in the air, then land and charge.</div>
+<div class="row-item">
+<label class="row-label" for="ceiling_aim" id="ceiling_aim-label">Aim ults at the ceiling
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="ceiling_aim" role="switch" type="checkbox"/></div></div><div class="row-hint">Each life: zoom out and tilt the camera up before charging.</div>
+</div>
+</section>
+<section class="settings-section" id="section-movement" tabindex="-1">
+<h2 class="section-title">Movement</h2>
+<div class="panel">
+<div class="row-item">
+<label class="row-label" for="movement" id="movement-label">Movement
+</label>
+
+<div class="row-ctrl"><select class="inp" data-segmented="" data-setting="" id="movement">
+<option value="off">Off</option>
+<option value="w">W</option>
+<option value="wa">W+A</option>
+<option value="wd">W+D</option>
+<option value="circle">Circle</option>
+</select></div></div><div class="row-hint">Ki blasts only. Charging 4x Kamehameha stays still.</div>
+<div class="setting-dependent" data-depends="movement"><div class="row-item">
+<label class="row-label" for="sprint" id="sprint-label">Sprint
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="sprint" role="switch" type="checkbox"/></div></div><div class="row-hint">Hold Shift while moving.</div></div>
+<div class="row-item">
+<label class="row-label" for="blast_jump" id="blast_jump-label">Jump while blasting
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="blast_jump" role="switch" type="checkbox"/></div></div><div class="row-hint">Double hop every 1.2-2 s while firing Ki blasts.</div>
+<div class="row-item">
+<label class="row-label" for="relock" id="relock-label">Re-lock now and then
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="relock" role="switch" type="checkbox"/></div></div><div class="row-hint">Retake lock-on every 8-15 s when target switching stalls.</div>
+</div>
+</section>
+<section class="settings-section" id="section-chamber" tabindex="-1">
+<h2 class="section-title">Chamber</h2>
+<div class="panel">
+<div class="row-item">
+<label class="row-label" for="auto_gravity" id="auto_gravity-label">Auto gravity
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="auto_gravity" role="switch" type="checkbox"/></div></div><div class="row-hint">Set gravity once at the start of each run.</div>
+<div class="setting-dependent" data-depends="auto_gravity"><div class="row-item">
+<label class="row-label" for="gravity" id="gravity-label">Gravity</label>
+
+<div class="row-ctrl"><div class="xyn-controls">
+<input class="setting-slider" data-range-for="gravity" data-setting="" id="gravity" max="100" min="0" step="10" type="range"/>
+<output class="xyn-mono" id="gravity-value">100G</output>
+</div></div></div></div>
+<div class="row-item">
+<label class="row-label" for="hide_chat" id="hide_chat-label">Hide chat
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="hide_chat" role="switch" type="checkbox"/></div></div><div class="row-hint">Keep chat from covering the HP and Ki bars.</div>
+<div class="row-item">
+<label class="row-label" for="auto_buy" id="auto_buy-label">Auto-buy 4x Kamehameha
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="auto_buy" role="switch" type="checkbox"/></div></div><div class="row-hint">While dead. Requires level 135 and 5,000 Zeni.</div>
+<div class="setting-dependent" data-depends="auto_buy"><div class="row-item">
+<label class="row-label" for="replace_slot" id="replace_slot-label">Replace slot move
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="replace_slot" role="switch" type="checkbox"/></div></div><div class="row-hint">Replace another move in your selected ult slot.</div></div>
+<div class="setting-dependent" data-depends="replace_slot"><div class="row-item">
+<label class="row-label" for="restore_slot" id="restore_slot-label">Put the old move back at the end
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="restore_slot" role="switch" type="checkbox"/></div></div><div class="row-hint">Re-equips the replaced move when the run ends.</div></div>
+<div class="row-item">
+<label class="row-label" for="ki_control_spend" id="ki_control_spend-label">Spend skill points on Ki Control
+</label>
+
+<div class="row-ctrl"><input aria-describedby="ki_control_spend-hint" class="toggle" data-setting="" id="ki_control_spend" role="switch" type="checkbox"/></div></div><div class="row-hint" id="ki_control_spend-hint">While dead, spends points on Ki Control until it reaches the target. Spent points are permanent.</div>
+<div class="setting-dependent" data-depends="ki_control_spend"><div class="row-item">
+<label class="row-label" for="ki_control_target" id="ki_control_target-label">Ki Control output target</label>
+
+<div class="row-ctrl"><div class="number-unit">
+<input class="inp" data-setting="" id="ki_control_target" max="5000" min="1" step="1" type="number"/>
+</div></div></div></div>
+</div>
+</section>
+<section class="settings-section" id="section-stopping" tabindex="-1">
+<h2 class="section-title">Stopping</h2>
+<div class="panel">
+<div class="row-item">
+<label class="row-label" for="stop_enabled" id="stop_enabled-label">Stop at time left
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="stop_enabled" role="switch" type="checkbox"/></div></div><div class="row-hint">End the run when the chamber timer reaches your threshold.</div>
+<div class="setting-dependent" data-depends="stop_enabled"><div class="row-item">
+<label class="row-label" for="stop_at_seconds" id="stop_at_seconds-label">Threshold</label>
+
+<div class="row-ctrl"><div class="xyn-controls">
+<div class="number-unit">
+<input class="inp" data-setting="" id="stop_at_seconds" max="604800" min="0" step="1" type="number"/>
+<span>s</span>
+</div>
+<output class="xyn-mono" id="stop-pretty">1m 0s</output>
+</div></div></div></div>
+<div class="row-item" id="after-row">
+<label class="row-label" for="after_run">After reaching the threshold
+</label>
+
+<div class="row-ctrl"><select class="inp" data-setting="" id="after_run">
+<option value="none">Do nothing</option>
+<option value="close_app">Close XynLevel</option>
+<option value="shutdown">Shut down PC</option>
+</select></div></div><div class="row-hint">30 s countdown, cancellable. Manual stops and errors skip this.</div>
+</div>
+</section>
+<section class="settings-section" id="section-appearance" tabindex="-1">
+<h2 class="section-title">Appearance</h2>
+<div class="panel">
+<div class="appearance-row">
+<label for="theme" id="theme-label">Theme<small class="row-hint">Your chamber, in a different light.</small>
+</label>
+<select class="inp" data-setting="" hidden="" id="theme">
+<option value="dark">Steel</option>
+<option value="aero">Glass</option>
+<option value="light">Daylight</option>
+<option value="system">Follow Windows</option>
+</select>
+<div aria-labelledby="theme-label" class="theme-grid" role="group">
+<button aria-pressed="false" class="theme-card" data-theme-choice="dark" type="button"><span class="theme-preview" style="background:linear-gradient(120deg,#3a3a42,#6a6a74)"></span><span class="theme-meta"><span class="theme-card-name">Steel</span></span></button>
+<button aria-pressed="false" class="theme-card" data-theme-choice="aero" type="button"><span class="theme-preview" style="background:linear-gradient(120deg,#8f7bff,#5a8bff)"></span><span class="theme-meta"><span class="theme-card-name">Glass</span></span></button>
+<button aria-pressed="false" class="theme-card" data-theme-choice="light" type="button"><span class="theme-preview" style="background:linear-gradient(120deg,#c8ced5,#edf0f5)"></span><span class="theme-meta"><span class="theme-card-name">Daylight</span></span></button>
+<button aria-pressed="false" class="theme-card" data-theme-choice="system" type="button"><span class="theme-preview" style="background:linear-gradient(120deg,#464955,#c8ced5)"></span><span class="theme-meta"><span class="theme-card-name">Follow Windows</span></span></button>
+</div>
+</div>
+<div class="appearance-row">
+<label for="nav_style" id="nav_style-label">Navigation style</label>
+<select class="inp" data-setting="" hidden="" id="nav_style">
+<option value="keycap">Keycap dock</option><option value="dial">Dial</option>
+</select>
+<div aria-labelledby="nav_style-label" class="theme-grid nav-style-grid" role="group">
+<button aria-pressed="true" class="theme-card" data-nav-choice="keycap" type="button"><span aria-hidden="true" class="nav-style-preview preview-keycap"><i></i><i></i><i></i><i></i></span><span class="theme-meta"><span class="theme-card-name">Keycap dock</span></span></button>
+<button aria-pressed="false" class="theme-card" data-nav-choice="dial" type="button"><span aria-hidden="true" class="nav-style-preview preview-dial"><i></i><i></i><i></i></span><span class="theme-meta"><span class="theme-card-name">Dial</span></span></button>
+</div>
+</div>
+<div class="setting-dependent" data-depends="nav_style" data-depends-value="dial" hidden="">
+<div class="row-item"><label class="row-label" for="dial_sounds" id="dial_sounds-label">Dial sounds</label><div class="row-ctrl"><input class="toggle" data-setting="" id="dial_sounds" role="switch" type="checkbox"/></div></div>
+<div class="row-hint">Soft mechanical ticks as the dial turns.</div>
+</div>
+<div class="row-item accent-row">
+<label class="row-label" for="accent">Accent colour
+</label>
+
+<div class="row-ctrl"><div aria-label="Accent presets" class="swatches" role="group"><button aria-label="Steel" aria-pressed="false" class="swatch" data-accent-choice="#b4bbc8" style="--swatch:#b4bbc8" title="Steel" type="button"><span>✓</span></button>
+<button aria-label="Violet" aria-pressed="false" class="swatch" data-accent-choice="#939aff" style="--swatch:#939aff" title="Violet" type="button">
+<span>✓</span>
+</button>
+<button aria-label="Cyber Teal" aria-pressed="false" class="swatch" data-accent-choice="#22d3ee" style="--swatch:#22d3ee" title="Cyber Teal" type="button">
+<span>✓</span>
+</button>
+<button aria-label="Solar Flare" aria-pressed="false" class="swatch" data-accent-choice="#fbbf24" style="--swatch:#fbbf24" title="Solar Flare" type="button">
+<span>✓</span>
+</button>
+<button aria-label="Kaioken" aria-pressed="false" class="swatch" data-accent-choice="#ff6b6b" style="--swatch:#ff6b6b" title="Kaioken" type="button">
+<span>✓</span>
+</button>
+<button aria-label="Senzu" aria-pressed="false" class="swatch" data-accent-choice="#5ee6a8" style="--swatch:#5ee6a8" title="Senzu" type="button">
+<span>✓</span>
+</button>
+<button aria-label="Majin" aria-pressed="false" class="swatch" data-accent-choice="#f07ad1" style="--swatch:#f07ad1" title="Majin" type="button">
+<span>✓</span>
+</button>
+<label class="custom-accent" title="Custom accent">
+<input aria-label="Custom accent colour" data-setting="" id="accent" type="color"/>
+<span aria-hidden="true">+</span>
+</label>
+</div></div></div><div class="row-hint" id="accent-value">#939AFF</div>
+<div class="row-item">
+<label class="row-label" for="reduced_motion" id="reduced_motion-label">Reduce motion
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="reduced_motion" role="switch" type="checkbox"/></div></div><div class="row-hint">Keep the feedback. Skip the movement.</div>
+<div class="row-item" hidden="">
+<label class="row-label" for="always_on_top" id="always_on_top-label">Always on top
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="always_on_top" role="switch" type="checkbox"/></div></div>
+</div>
+</section>
+<section class="settings-section" id="section-notifications" tabindex="-1">
+<h2 class="section-title">Notifications</h2>
+<div class="panel">
+<div class="row-item">
+<label class="row-label" for="notifications" id="notifications-label">Desktop notifications
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="notifications" role="switch" type="checkbox"/></div></div><div class="row-hint">A Windows pop-up when a run ends. Turn it off here any time.</div>
+<div class="row-item">
+<label class="row-label" for="sound" id="sound-label">Sound when the run ends
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="sound" role="switch" type="checkbox"/></div></div><div class="row-hint">Plays when the stop time is reached.</div>
+</div>
+<h3 class="section-title">Discord reports</h3>
+<div class="panel" id="webhook-panel">
+<div class="row-item">
+<label class="row-label" for="webhook-url">Webhook URL
+</label>
+
+<div class="row-ctrl"><div class="webhook-entry">
+<input autocomplete="off" class="inp" id="webhook-url" placeholder="https://discord.com/api/webhooks/..." spellcheck="false" type="password"/>
+<button class="xyn-primary btn-sm" id="webhook-save">Save</button>
+</div></div></div><div class="row-hint" id="webhook-url-hint">Paste a Discord webhook. It's encrypted for your Windows account and never shown again.</div>
+<div class="row-item">
+<label class="row-label" for="webhook-enabled">Send run reports
+</label>
+
+<div class="row-ctrl"><input class="toggle" id="webhook-enabled" role="switch" type="checkbox"/></div></div><div class="row-hint">Finished, stopped and needs-attention runs, with run time, deaths and ults.</div>
+<div class="row-item">
+<label class="row-label" for="webhook-progress">Progress updates
+</label>
+
+<div class="row-ctrl"><select class="inp" id="webhook-progress">
+<option value="0">Off</option><option value="5">5 min</option><option value="10">10 min</option>
+<option value="15">15 min</option><option value="30">30 min</option><option value="60">60 min</option>
+</select></div></div><div class="row-hint">Optional update while a run is going.</div>
+<div class="row-item">
+<span class="row-label">Status
+</span>
+
+<div class="row-ctrl"><div class="webhook-actions">
+<button class="btn-sm" id="webhook-test">Send test</button>
+<button class="xyn-danger btn-sm" id="webhook-clear">Remove</button>
+</div></div></div><div class="row-hint" id="webhook-status" role="status">Not set up</div>
+</div>
+</section>
+<p class="save-status" id="save-status" role="status">Connecting...</p>
+<div class="panel">
+<div class="row-item">
+<span class="row-label">Start fresh
+</span>
+
+<div class="row-ctrl"><button class="xyn-danger btn-sm" id="reset-settings">Restore defaults</button></div></div><div class="row-hint">Your previous settings are backed up.</div>
+</div>
+</section><section class="page view" hidden="" id="window">
+<div class="page-header">
+<h1>Window</h1>
+<p>Roblox window size for accurate screen reading</p>
+<a class="dial-neighbour dial-prev" href="#settings">&#8249; Settings</a><a class="dial-neighbour dial-next" href="#tools">Tools &#8250;</a>
+</div>
+<div class="section-title">Roblox</div>
+<div class="panel">
+<div class="row-item"><span class="row-label">Current game area</span><div class="row-ctrl"><span class="mono-badge" id="game-size">Checking...</span></div></div>
+<div class="row-hint">The bot reads the screen at exactly 1920 × 1080 (borders don't count).</div>
+<div class="row-item"><span class="row-label">Set the window</span><div class="row-ctrl"><button class="btn-sm" disabled="" id="set-window">Set window</button></div></div>
+<div class="row-hint" id="window-hint">Every run does this on its own: fullscreen on a 1080p display, a centred 1920 × 1080 window on bigger ones.</div>
+</div>
+<div class="section-title">Troubleshooting</div>
+<div class="panel panel-static">
+<div class="tip-row"><span class="tip-label">Before starting</span><span class="tip-val">Stand in the Gravity Chamber bot room. Alive or dead is fine.</span></div>
+<div class="tip-row"><span class="tip-label">Won't start</span><span class="tip-val">Open Roblox first. F6 only starts a run while Roblox is the active window.</span></div>
+<div class="tip-row"><span class="tip-label">Lost focus</span><span class="tip-val">Losing focus pauses the run. Return to Roblox and it carries on; the status reads Paused meanwhile.</span></div>
+<div class="tip-row"><span class="tip-label">No ults</span><span class="tip-val">Check the ult slot (7 or 8) in Settings and that the move is equipped. Auto falls back to Ki blasts.</span></div>
+</div>
+</section><section class="page view" hidden="" id="tools">
+<div class="page-header">
+<div>
+<h1>Tools</h1>
+<p>Bug reports, session log and app files</p>
+<a class="dial-neighbour dial-prev" href="#window">&#8249; Window</a><a class="dial-neighbour dial-next" href="#stats">Stats &#8250;</a>
+</div>
+</div>
+<h2 class="section-title">Files</h2>
+<div class="panel">
+<div class="row-item">
+<span>Settings, logs and saved reports</span>
+<button class="btn-sm" id="open-data">Open app data</button>
+</div>
+</div>
+<h2 class="section-title">Bug report</h2><div class="panel">
+<div class="row-item">
+<span>Build a local report<small class="row-hint">Preview settings, window checks and redacted events before saving.</small>
+</span>
+<button class="btn-sm" id="report-preview">Preview report</button>
+</div>
+</div><h2 class="section-title">Session log</h2>
+<div class="panel">
+<div class="log-toolbar">
+<input aria-label="Filter events" class="inp" id="log-filter" placeholder="Filter this session..." type="search"/>
+<label class="follow-label">
+<input checked="" id="log-follow" type="checkbox"/> Follow latest</label>
+<button class="btn-sm" id="export-logs">Save redacted log</button>
+</div>
+<div aria-label="Session events" class="log-viewer" id="logs" tabindex="0">No events yet.</div>
+</div>
+
+
+<h2 class="section-title">Updates</h2>
+<div class="panel">
+<div class="row-item">
+<span>Updates</span>
+<span class="badge">GitHub</span>
+</div>
+<p class="xyn-help" id="update-status">New versions are posted on the GitHub Releases page.</p>
+</div>
+</section><section class="page view" hidden="" id="stats">
+<div class="page-header"><h1>Stats</h1><p>Current session and latest run</p><a class="dial-neighbour dial-prev" href="#tools">&#8249; Tools</a></div>
+<div class="stats-panel"><div aria-label="Session statistics" class="session-grid" id="session-stats"></div><a class="session-rule" data-open-setting="stop_at_seconds" href="#settings"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 6v6l4 2"></path></svg><span>Stop at time left</span><output class="context-value" id="session-stop-at">Off</output></a><p class="session-note" id="session-note">Start a run to collect statistics. Level readings appear when available.</p></div>
+</section></div></main>
+
+</div>
+<div hidden="" id="after-banner" role="alert">
+<span class="banner-icon">!</span>
+<span id="after-message">
+</span>
+<button class="btn-sm" id="cancel-after">Cancel action</button>
+</div><div class="compact-hud" data-tauri-drag-region="" hidden="" id="mini">
+<span class="xyn-dot" id="mini-dot">
+</span>
+<span data-tauri-drag-region="" id="mini-status">Connecting</span>
+<span class="hud-separator">
+</span>
+<span class="xyn-mono" id="mini-time">--:--</span>
+<button class="btn-sm" hidden="" id="mini-cancel">Cancel action</button>
+<span class="hud-separator hud-counters">
+</span>
+<span class="xyn-mono hud-counters" id="mini-counters">
+</span>
+<span class="xyn-spacer" data-tauri-drag-region="">
+</span>
+<button class="xyn-primary btn-sm" disabled="" id="mini-run">Start</button>
+<button aria-label="Expand view" class="btn-ghost btn-sm" id="mini-expand" title="Expand view">
+<svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewbox="0 0 24 24">
+<path d="m8 9 4-4 4 4M4 16h16"></path>
+</svg>
+</button>
+<button aria-label="Close and stop the macro" class="btn-ghost btn-sm" id="mini-close" title="Close and stop the macro">
+<svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewbox="0 0 24 24">
+<path d="m6 6 12 12M6 18 18 6"></path>
+</svg>
+</button>
+<span aria-hidden="true" id="mini-progress">
+</span>
+</div><div hidden="" id="toast" role="status">
+</div><dialog id="report-dialog">
+<div class="dialog-heading">
+<h2>Report preview</h2>
+<button aria-label="Close preview" class="btn-sm" id="report-close">×</button>
+</div>
+<p>This exact preview is saved locally as a ZIP. No screenshots.</p>
+<pre id="report-content" tabindex="0">
+</pre>
+<div class="dialog-actions">
+<button class="btn-primary btn-sm" id="report-save">Save bundle</button>
+</div>
+</dialog></div>
+<template id="respawn-learning-template"><div class="respawn-context" title="The bot automatically learns its respawn delay. This is its mode, not a measured timing."><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" viewBox="0 0 24 24"><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"></path></svg><span>Respawn learning</span><span class="context-value">Auto</span></div></template>
+</body>
+</html>

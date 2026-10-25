@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "XynLevel",
+  "mainBinaryName": "XynLevel",
+  "version": "1.0.0",
+  "identifier": "com.xynlevel.app",
+  "build": { "frontendDist": "../web-dist", "beforeBuildCommand": "bun scripts/stage-frontend.mjs", "beforeDevCommand": "bun scripts/stage-frontend.mjs" },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [{
+      "label": "main", "title": "XynLevel", "width": 980, "height": 700,
+      "minWidth": 680, "minHeight": 520, "decorations": false,
+      "resizable": true, "center": true, "backgroundColor": "#0d0d10"
+    }],
+    "security": {
+      "csp": "default-src 'self'; connect-src 'self' ipc: http://ipc.localhost; font-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
+    }
+  },
+  "plugins": { "updater": { "pubkey": "", "endpoints": [] } },
+  "bundle": {
+    "active": true, "targets": "nsis", "createUpdaterArtifacts": false,
+    "publisher": "Xyn", "externalBin": ["binaries/XynLevel-core"],
+    "resources": ["resources/licenses/*"],
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.ico"],
+    "windows": { "nsis": { "installMode": "currentUser" } }
+  }
+}

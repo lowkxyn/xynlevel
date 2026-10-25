@@ -1,0 +1,16 @@
+XynLevel third-party font notices
+================================
+
+This distribution includes the following unmodified fonts under the SIL Open
+Font License, Version 1.1, provided in the adjacent OFL-1.1.txt file.
+
+Chakra Petch
+Copyright 2018 The Chakra Petch Project Authors
+
+DM Mono
+Copyright 2020 The DM Mono Project Authors
+
+Inter
+Copyright 2016 The Inter Project Authors
+
+Their inclusion does not place XynLevel itself under the SIL Open Font License.

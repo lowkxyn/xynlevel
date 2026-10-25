@@ -1,0 +1,13 @@
+{
+  "name": "XynLevel",
+  "brand": "XYNLEVEL",
+  "exe": "XynLevel.exe",
+  "identifier": "com.xynlevel.app",
+  "registryKey": "Software\\Xyn\\XynLevel",
+  "uninstallKey": "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\XynLevel",
+  "icon": "../src-tauri/icons/icon.ico",
+  "logo": "../src-tauri/icons/128x128@2x.png",
+  "letters": "../src/assets/logo.png",
+  "readyText": "Start XynLevel to configure your levelling session.",
+  "updateText": "Update uses your existing install folder. Close XynLevel before continuing."
+}
