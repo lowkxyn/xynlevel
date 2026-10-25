@@ -1,4 +1,4 @@
-"""Buying and equipping 4x Kaioken Kamehameha through DBOG's menu, done while dead.
+"""Buying and equipping 4x Kaioken Kamehameha through DG's menu, done while dead.
 
 Dying closes menus, so the macro only opens them on the death screen, before respawning.
 Every click is confirmed by what appears next (titles, rows, the Purchased toast); nothing is

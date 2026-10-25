@@ -5,7 +5,7 @@
 <h1 align="center">XynLevel</h1>
 
 <p align="center">
-  Levels your <b>Dragon Ball Online Generations</b> (DBOG) character in the Gravity Chamber bot room while you're away.<br>
+  Levels your <b>Dragon Generations</b> (DG, formerly Dragon Ball Online Generations / DBOG) character in the Gravity Chamber bot room while you're away.<br>
   Free, open source, Windows 10/11.
 </p>
 
@@ -13,11 +13,7 @@
   <a href="https://github.com/lowkxyn/xynlevel/releases/latest"><b>Download the latest release</b></a>
 </p>
 
-<p align="center">
-  <a href="https://github.com/lowkxyn/xynlevel/releases/download/v1.0.0/XynLevel-1.0.0-promo.mp4">
-    <img src="docs/promo.png" width="760" alt="Watch the one-minute video">
-  </a>
-</p>
+https://github.com/user-attachments/assets/cd2ed2d1-334d-4f0c-bed8-a4577b30f484
 
 ---
 
@@ -65,7 +61,7 @@ the bot is a packaged Python program that sends key presses. You can build it yo
 
 ## Quick start
 
-1. Open Roblox, join DBOG and go into the **Gravity Chamber bot room**. Alive or dead is fine.
+1. Open Roblox, join DG and go into the **Gravity Chamber bot room**. Alive or dead is fine.
 2. Open XynLevel and look through **Settings**. The defaults work for most people.
 3. Click into Roblox so it's the active window, then press **F6**. Press **F6** again to stop.
 
