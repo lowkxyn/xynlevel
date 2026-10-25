@@ -1,14 +1,16 @@
 /* Steel (dark) theme surfaces. Light and Glass keep their own look.
-   The accent picker keeps its saved value; Steel uses neutral light. */
+   Steel's accent is neutral light unless a non-default accent colour is picked. */
 .run-kbd,.stop-dot,.dial-state,.dial-neighbour{display:none}
 .xyn-app[data-theme=light] #stop-button{background:var(--bg-input);color:var(--text2);border-color:var(--border-input)}
+.xyn-app[data-theme=dark][data-ui=classic]:not([data-custom-accent=true]){
+  --accent:#eeeef2!important;--accent-readable:#eeeef2!important;--accent-ink:#101013!important;
+  --accent-text:#eeeef2;--accent2:#fff;--accent-dim:rgba(255,255,255,.08);
+}
 .xyn-app[data-theme=dark][data-ui=classic]{
   --bg:#050506;--bg-alt:#0b0b0d;--bg-card:#101013;--bg-input:#101013;
   --bg-hover:#1a1a20;--bg-nav:#09090b;--border:rgba(255,255,255,.1);
   --border-light:rgba(255,255,255,.06);--border-input:rgba(255,255,255,.1);
   --text:#eeeef2;--text2:#85858f;--text3:#85858f;
-  --accent:#eeeef2!important;--accent-readable:#eeeef2!important;--accent-ink:#101013!important;
-  --accent-text:#eeeef2;--accent2:#fff;--accent-dim:rgba(255,255,255,.08);
   --grad-from:#8d8d94;--grad-to:#fff;--glow1:transparent;--glow2:transparent;--glow3:transparent;
   --dock-tray:#09090b;--dock-key-top:#2b2b32;--dock-key-bottom:#16161a;
   --font-ui:"Segoe UI",Inter,system-ui,-apple-system,sans-serif;

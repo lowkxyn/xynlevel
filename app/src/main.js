@@ -68,6 +68,7 @@ function appearance() {
   telemetry.syncMotion();
   $('app').style.setProperty('--accent', settings.accent);
   $('app').dataset.gold = String(settings.accent.toLowerCase() === '#f5c04a');
+  $('app').dataset.customAccent = String(settings.accent.toLowerCase() !== DEFAULTS.accent);
   $('pin-indicator').hidden = !settings.always_on_top;
   $('pin-toggle').setAttribute('aria-pressed', String(settings.always_on_top));
   if (settings.reduced_motion) motion.clearEffects();
