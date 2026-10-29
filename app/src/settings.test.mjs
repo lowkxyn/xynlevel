@@ -1,79 +1,72 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { DEFAULTS, resolveTheme, validateSettings } from './settings.js';
+import { DEFAULTS, loadSettings, resolveTheme, validateSettings } from './settings.js';
 
-test('defaults match the GC core contract', () => {
+test('defaults match the training contract and survive persistence', () => {
   const value = validateSettings({});
-  assert.equal(value.attack, 'auto');
-  assert.equal(value.ult_slot, 7);
-  assert.equal(value.blast_interval, 0.4);
-  assert.equal(value.scroll_interval, 1);
-  assert.equal(value.stop_enabled, false);
-  assert.equal(value.movement, 'circle');
-  assert.equal(value.sprint, true);
-  assert.equal(value.blast_jump, true);
-  assert.equal(value.ki_control_spend, false);
-  assert.equal(value.ki_control_target, 300);
-  assert.equal(value.after_run, 'none');
-  assert.equal(value.theme, 'dark');
-  assert.equal(value.accent, '#b4bbc8');
+  assert.deepEqual(value, {
+    gravity_mode: 'max', gravity: 500, auto_senzu: true, senzu_at: 35,
+    stop_after_minutes: 0, stop_at_level: 0, theme: 'dark', accent: '#b4bbc8',
+    nav_style: 'keycap', dial_sounds: false, reduced_motion: false, notifications: true,
+    sound: false, after_run: 'none', always_on_top: false,
+  });
   assert.deepEqual(validateSettings(JSON.parse(JSON.stringify(value))), value);
 });
-test('valid extremes and slot 8 survive persistence', () => {
-  const raw = { ...DEFAULTS, attack: 'ult', ult_slot: 8, stop_at_seconds: 604800, blast_interval: 0.05, scroll_interval: 60 };
-  assert.deepEqual(validateSettings(raw), raw);
-  assert.equal(validateSettings({ stop_at_seconds: 0 }).stop_at_seconds, 0);
+
+test('training integer boundaries and custom values survive persistence', () => {
+  for (const [key, min, max] of [['gravity', 1, 500], ['senzu_at', 10, 90], ['stop_after_minutes', 0, 10080], ['stop_at_level', 0, 100000]]) {
+    for (const number of [min, max]) {
+      const raw = { ...DEFAULTS, gravity_mode: 'custom', [key]: number };
+      assert.deepEqual(validateSettings(JSON.parse(JSON.stringify(raw))), raw);
+    }
+  }
+  assert.equal(validateSettings({ gravity: 123 }).gravity, 123);
 });
-test('old saved settings gain new booleans and explicit false survives', () => {
-  const old = { ...DEFAULTS, attack: 'blasts' };
-  delete old.restore_slot;
-  delete old.ceiling_aim;
-  const value = validateSettings(JSON.parse(JSON.stringify(old)));
-  assert.equal(value.restore_slot, true);
-  assert.equal(value.ceiling_aim, true);
-  assert.equal(value.attack, 'blasts');
-  for (const key of ['restore_slot', 'ceiling_aim', 'blast_jump', 'ki_control_spend']) {
+
+test('legacy settings load silently without retaining bot-room keys or gravity', () => {
+  const legacy = { attack: 'ult', ult_slot: 8, auto_gravity: false, gravity: 0, movement: 'off',
+    stop_enabled: true, stop_at_seconds: 60, ki_control_spend: true, extra_legacy: 'ignored',
+    theme: 'light', accent: '#22d3ee', sound: true, notifications: false, after_run: 'close_app',
+    reduced_motion: true, always_on_top: true, nav_style: 'dial', dial_sounds: true };
+  const loaded = loadSettings(JSON.parse(JSON.stringify(legacy)));
+  assert.deepEqual(loaded, { ...DEFAULTS, theme: 'light', accent: '#22d3ee', sound: true, notifications: false,
+    after_run: 'close_app', reduced_motion: true, always_on_top: true, nav_style: 'dial', dial_sounds: true });
+  assert.equal(legacy.gravity, 0);
+  assert.throws(() => validateSettings(legacy));
+  assert.equal(loadSettings({ ...legacy, gravity_mode: 'custom', gravity: 175 }).gravity, 175);
+});
+
+test('explicit false and zero values survive loading missing new fields', () => {
+  const value = loadSettings({ auto_senzu: false, stop_after_minutes: 0, stop_at_level: 0, sound: false });
+  assert.equal(value.auto_senzu, false);
+  assert.equal(value.senzu_at, 35);
+  assert.equal(value.stop_after_minutes, 0);
+  assert.equal(value.stop_at_level, 0);
+  assert.equal(value.sound, false);
+});
+
+test('new writes reject malformed shapes, removed keys and nonboolean switches', () => {
+  for (const raw of [null, [], 'settings', { attack: 'auto' }, { toString: 'invalid' }, { extra: 1 }]) {
+    assert.throws(() => validateSettings(raw));
+  }
+  for (const key of ['auto_senzu', 'notifications', 'sound', 'reduced_motion', 'always_on_top', 'dial_sounds']) {
     assert.equal(validateSettings({ [key]: false })[key], false);
-    for (const bad of [null, 0, 1, 'false', [], {}]) {
-      assert.throws(() => validateSettings({ [key]: bad }));
+    for (const bad of [null, 0, 1, 'false', [], {}]) assert.throws(() => validateSettings({ [key]: bad }));
+  }
+});
+
+test('training integers reject fractions, nonnumbers, nonfinite and out-of-range values', () => {
+  for (const [key, min, max] of [['gravity', 1, 500], ['senzu_at', 10, 90], ['stop_after_minutes', 0, 10080], ['stop_at_level', 0, 100000]]) {
+    for (const bad of [min - 1, max + 1, 1.5, null, true, false, '35', '', [], {}, NaN, Infinity, -Infinity]) {
+      assert.throws(() => validateSettings({ [key]: bad }), `${key}: ${bad}`);
+      assert.throws(() => loadSettings({ [key]: bad }), `${key}: ${bad}`);
     }
   }
 });
-test('old movement and sprint choices survive new bot defaults', () => {
-  const old = { ...DEFAULTS, movement: 'off', sprint: false };
-  for (const key of ['blast_jump', 'ki_control_spend', 'ki_control_target']) delete old[key];
-  const value = validateSettings(JSON.parse(JSON.stringify(old)));
-  assert.equal(value.movement, 'off');
-  assert.equal(value.sprint, false);
-  assert.equal(value.blast_jump, true);
-  assert.equal(value.ki_control_spend, false);
-  assert.equal(value.ki_control_target, 300);
-});
-test('Ki Control target clamps whole numbers and persists', () => {
-  for (const [target, expected] of [[-10, 1], [0, 1], [1, 1], [300, 300], [5000, 5000], [5001, 5000]]) {
-    const value = validateSettings({ ki_control_target: target });
-    assert.equal(value.ki_control_target, expected);
-    assert.deepEqual(validateSettings(JSON.parse(JSON.stringify(value))), value);
-  }
-});
-test('Ki Control target rejects non-numbers and fractional numbers', () => {
-  for (const target of [null, true, false, '300', '', [], {}, NaN, Infinity, -Infinity, 1.5]) {
-    assert.throws(() => validateSettings({ ki_control_target: target }));
-  }
-});
-test('rejects malformed shapes, unsupported fields and string booleans', () => {
-  for (const value of [null, [], 'settings', { extra: 1 }, { toString: 'invalid' }, { stop_enabled: 'false' }, { ult_slot: '7' }, { ult_slot: true }, { notifications: 1 }]) {
-    assert.throws(() => validateSettings(value));
-  }
-});
-test('rejects nonfinite, unsafe and out-of-range timing values', () => {
-  for (const raw of [{ blast_interval: NaN }, { scroll_interval: Infinity }, { blast_interval: 0 },
-    { scroll_interval: '1' }, { stop_at_seconds: 1.5 }, { stop_at_seconds: -1 }, { stop_at_seconds: 604801 }]) {
-    assert.throws(() => validateSettings(raw));
-  }
-});
-test('theme input is allowlisted and system theme follows the OS', () => {
-  for (const raw of [{ theme: 'other' }, { accent: 'red' }, { accent: '#123456; color:red' }, { after_run: 'shell' }]) {
+
+test('enum and colour input stays allowlisted; system theme follows the OS', () => {
+  for (const raw of [{ gravity_mode: 'off' }, { nav_style: 'other' }, { theme: 'other' },
+    { accent: 'red' }, { accent: '#123456; color:red' }, { after_run: 'shell' }]) {
     assert.throws(() => validateSettings(raw));
   }
   assert.equal(resolveTheme('system', true), 'light');
@@ -81,19 +74,14 @@ test('theme input is allowlisted and system theme follows the OS', () => {
   assert.equal(resolveTheme('aero', true), 'aero');
 });
 
-
-test('navigation defaults migrate old files and malformed cosmetic values recover', () => {
-  const old = { ...DEFAULTS, attack: 'blasts' };
-  delete old.nav_style;
-  delete old.dial_sounds;
-  const value = validateSettings(old);
-  assert.equal(value.nav_style, 'keycap');
-  assert.equal(value.dial_sounds, false);
-  assert.equal(value.attack, 'blasts');
+test('loading recovers cosmetic preferences while writes stay strict', () => {
   for (const bad of [null, 0, 1, 'other', [], {}]) {
-    assert.equal(validateSettings({ nav_style: bad }).nav_style, 'keycap');
-    assert.equal(validateSettings({ dial_sounds: bad }).dial_sounds, false);
+    assert.equal(loadSettings({ nav_style: bad }).nav_style, 'keycap');
+    assert.equal(loadSettings({ dial_sounds: bad }).dial_sounds, false);
+    assert.throws(() => validateSettings({ nav_style: bad }));
+    assert.throws(() => validateSettings({ dial_sounds: bad }));
   }
+  for (const bad of [null, [], 'settings']) assert.throws(() => loadSettings(bad));
   const dial = { ...DEFAULTS, nav_style: 'dial', dial_sounds: true };
-  assert.deepEqual(validateSettings(JSON.parse(JSON.stringify(dial))), dial);
+  assert.deepEqual(loadSettings(JSON.parse(JSON.stringify(dial))), dial);
 });

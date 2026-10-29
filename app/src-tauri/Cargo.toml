@@ -1,6 +1,6 @@
 [package]
 name = "xynlevel"
-version = "1.0.0"
+version = "1.0.1"
 description = "XynLevel Gravity Chamber levelling macro desktop shell"
 authors = ["Xyn"]
 edition = "2021"

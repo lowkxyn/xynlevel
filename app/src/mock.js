@@ -5,45 +5,43 @@ export function createMock() {
   const params = new URLSearchParams(location.search);
   const name = params.get('state') || 'idle';
   let snapshot = {
-    ok: true, version: '1.0.0', running: !['idle', 'stopped', 'complete'].includes(name), stopping: false,
-    status: 'Ready. Stand in the bot room, then start.', time_left: null, time_formatted: null, stats: null, webhook: { configured: true, enabled: true, progress_minutes: 15, status: 'Last report delivered' },
+    ok: true, version: '1.0.1', running: !['idle', 'stopped', 'complete', 'countdown'].includes(name), stopping: false,
+    status: 'Ready. Stand in the Gravity Chamber, then start.', time_left: null, time_formatted: null, stats: null, webhook: { configured: true, enabled: true, progress_minutes: 15, status: 'Last report delivered' },
     settings: { ...DEFAULTS, nav_style: params.get('nav') || DEFAULTS.nav_style, dial_sounds: params.get('dial_sounds') !== 'off', theme: params.get('theme') || DEFAULTS.theme, accent: params.get('accent') || DEFAULTS.accent },
     settings_warning: null, input_logging: false, hotkey_available: true,
     window: { found: true, size: [1920, 1080], correct: true }, last_run: null,
     after_run: { action: null, status: 'idle', seconds: 0 },
   };
-  if (snapshot.running || name === 'stopped' || name === 'complete') {
-    snapshot.settings = { ...snapshot.settings, movement: 'wa', stop_enabled: true, after_run: 'close_app' };
-    Object.assign(snapshot, { time_left: 6130, time_formatted: '1h 42m 10s', stats: { elapsed: 1062, ults: 38, deaths: 2, blasts: 264 }, status: 'Charging Ki, 4x Kamehameha in slot 7' });
+  if (snapshot.running || ['stopped', 'complete', 'countdown'].includes(name)) {
+    snapshot.settings = { ...snapshot.settings, stop_after_minutes: 60, stop_at_level: 1300, after_run: 'close_app' };
+    Object.assign(snapshot, { stats: { elapsed: 1062, start_level: 1240, level: 1247, levels: 7, start_xp_percent: 20, xp_percent: 69,
+      deaths: 0, senzus: 4, refills: 4, pulls: 1010, paused: 12, gravity: 500, exp_mult: 212.13, drain: 519,
+      points_left: 182, senzu_left: 483 }, status: 'Training: Health' });
   }
-  if (name === 'blasts') snapshot.status = 'Ki blasts';
   if (name === 'promo') {
-    Object.assign(snapshot, {
-      status: 'Charging Ki, 4x Kamehameha in slot 7', time_left: 42, time_formatted: '42s',
-      stats: { elapsed: 2495, start_level: 203, level: 204, levels: 1, xp_percent: 69, ults: 405, deaths: 9, blasts: 8227 },
-    });
-    snapshot.settings = { ...snapshot.settings, stop_enabled: true, stop_at_seconds: 15, after_run: 'none' };
+    snapshot.stats = { ...snapshot.stats, elapsed: 2495, level: 1256, levels: 16, senzus: 9, refills: 9, deaths: 0, pulls: 2370, points_left: 140, senzu_left: 478 };
+    snapshot.settings.after_run = 'none';
   }
-  if (name === 'gravity') snapshot.status = 'Setting gravity to 100G';
-  if (name === 'shopping') snapshot.status = 'Checking the shop for 4x Kamehameha';
-  if (name === 'locking') snapshot.status = 'Retaking lock-on';
+  if (name === 'gravity') snapshot.status = 'Setting gravity to 500G';
+  if (name === 'preparing') snapshot.status = 'Getting ready';
+  if (name === 'eating') snapshot.status = 'Eating a Senzu';
+  if (name === 'refilling') snapshot.status = 'Getting a Senzu from the inventory';
+  if (name === 'paused') snapshot.status = "Paused: Roblox isn't the active window";
   if (name === 'stopping') snapshot.stopping = true;
-  if (name === 'firing') snapshot.status = 'Firing slot 7';
-  if (name === 'dead') Object.assign(snapshot, { status: 'Dead: clicking Respawn', time_left: 582, time_formatted: '9m 42s' });
+  if (['dead', 'respawning'].includes(name)) snapshot.status = 'Respawning';
+  if (name === 'partial') snapshot.stats = {};
   if (name === 'stopped') snapshot.status = 'Stopped: manual stop';
   if (name === 'complete') {
-    snapshot.status = 'Stopped: 60s (1m 0s) left';
+    snapshot.status = 'Stopped: ran for 60 min';
     snapshot.last_run = { id: 1, reason: snapshot.status, completed: true };
-    snapshot.time_left = 60;
-    snapshot.time_formatted = '1m 0s';
+    snapshot.stats.elapsed = 3600;
   }
   if (name === 'countdown') {
     snapshot.running = false;
-    snapshot.status = 'Stopped: 60s (1m 0s) left';
+    snapshot.status = 'Stopped: ran for 60 min';
     snapshot.after_run = { action: 'shutdown', status: 'countdown', seconds: 24 };
     snapshot.last_run = { id: 1, reason: snapshot.status, completed: true };
-    snapshot.time_left = 60;
-    snapshot.time_formatted = '1m 0s';
+    snapshot.stats.elapsed = 3600;
     snapshot.settings.after_run = 'shutdown';
   }
   if (params.has('reduced')) snapshot.settings.reduced_motion = true;
@@ -54,10 +52,10 @@ export function createMock() {
   const logs = [
     { time: '14:20:00', message: 'Bridge connected. F6 global toggle ready.' },
     { time: '14:20:02', message: 'Game area checked: 1920 x 1080.' },
-    { time: '14:20:04', message: 'Run started. Auto attack, ult slot 7.' },
-    { time: '14:20:06', message: 'Setting gravity to 100G' },
-    { time: '14:20:10', message: 'Charging Ki' },
-    { time: '14:20:24', message: 'Firing slot 7' },
+    { time: '14:20:04', message: 'Getting ready' },
+    { time: '14:20:06', message: 'Setting gravity to 500G' },
+    { time: '14:20:10', message: 'Training: Health' },
+    { time: '14:20:24', message: 'Eating a Senzu' },
   ];
   // This test surface exists only after explicitly opting into mock mode.
   window.xynMock = {
@@ -82,8 +80,8 @@ export function createMock() {
     if (action === 'start') {
       snapshot.running = true;
       snapshot.stopping = false;
-      snapshot.status = 'Charging';
-      snapshot.stats = { elapsed: 0, ults: 0, deaths: 0, blasts: 0 };
+      snapshot.status = 'Getting ready';
+      snapshot.stats = { elapsed: 0, deaths: 0, senzus: 0, refills: 0, pulls: 0, paused: 0 };
       snapshot.last_run = null;
     }
     if (action === 'stop') { snapshot.running = false; snapshot.status = 'Stopped: manual stop'; }

@@ -20,11 +20,6 @@ export function setupControls() {
   }
   for (const slider of document.querySelectorAll('[data-range-for]')) {
     const input = document.getElementById(slider.dataset.rangeFor);
-    // Gravity is itself the native settings field; interval sliders proxy numbers.
-    if (input === slider) {
-      slider.addEventListener('input', syncControls);
-      continue;
-    }
     slider.addEventListener('input', () => {
       input.value = slider.value;
       input.dispatchEvent(new Event('input', { bubbles: true }));
@@ -66,12 +61,12 @@ export function syncControls() {
     slider.value = document.getElementById(slider.dataset.rangeFor).value;
     slider.style.setProperty('--pct', `${(Number(slider.value) - Number(slider.min)) / (Number(slider.max) - Number(slider.min)) * 100}%`);
   }
-  document.getElementById('gravity-value').textContent = `${document.getElementById('gravity').value}G`;
   for (const row of document.querySelectorAll('[data-depends]')) {
     const parent = document.getElementById(row.dataset.depends);
     // Nested rows: a parent switched off by its own parent counts as off.
     const enabled = !parent.disabled && (row.dataset.dependsValue ? parent.value === row.dataset.dependsValue : parent.type === 'checkbox' ? parent.checked : parent.value !== 'off');
     row.classList.toggle('is-disabled', !enabled);
+    if (row.hasAttribute('data-hide-disabled')) row.hidden = !enabled;
     for (const control of row.querySelectorAll('input,select,button')) control.disabled = !enabled;
   }
   document.getElementById('after-row').classList.toggle('shutdown-warning', document.getElementById('after_run').value === 'shutdown');

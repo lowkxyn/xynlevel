@@ -2,7 +2,7 @@ param([string]$Python = "python")
 $ErrorActionPreference = "Stop"
 $appRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $coreRoot = Split-Path -Parent $appRoot
-$coreFiles = @("gc_bot.py", "gc_vision.py", "gc_gravity.py", "gc_menu.py", "gc_read.py", "gc_aim.py", "window.py", "gc_stats.py") | ForEach-Object { Join-Path $coreRoot $_ }
+$coreFiles = @("gc_train.py", "gc_bot.py", "gc_vision.py", "gc_gravity.py", "gc_menu.py", "gc_read.py", "gc_aim.py", "window.py", "gc_stats.py") | ForEach-Object { Join-Path $coreRoot $_ }
 $assetRoot = Join-Path $coreRoot "assets"
 $coreFiles += @(Get-ChildItem -LiteralPath $assetRoot -File -Recurse | ForEach-Object FullName)
 function Get-ContentHash([string]$Path) {

@@ -2,7 +2,7 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "XynLevel",
   "mainBinaryName": "XynLevel",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "identifier": "com.xynlevel.app",
   "build": { "frontendDist": "../web-dist", "beforeBuildCommand": "bun scripts/stage-frontend.mjs", "beforeDevCommand": "bun scripts/stage-frontend.mjs" },
   "app": {

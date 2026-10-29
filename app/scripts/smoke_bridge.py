@@ -40,7 +40,7 @@ def main():
             if not line:
                 raise RuntimeError("Bridge exited before readiness; check installed dependencies")
             ready = json.loads(line)
-            assert ready["pid"] == process.pid and ready["version"] == "1.0.0"
+            assert ready["pid"] == process.pid and ready["version"] == "1.0.1"
             port = ready["port"]
 
             def request(route, action=None):

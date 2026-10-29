@@ -58,7 +58,6 @@ export function createMotion(root) {
         flash(document.getElementById('status'), 'state-enter', 260);
       }
       if (!previous.running && snapshot.running) flash(document.getElementById('run'), 'run-start', 700);
-      if (snapshot.running && (snapshot.stats?.ults > previous.stats?.ults || (word === 'Firing' && previous.word !== word))) flash(document.getElementById('run'), 'ult-flash', 450);
       if (snapshot.stats?.deaths > previous.stats?.deaths) flash(document.querySelector('[data-stat=deaths]'), 'death-pop', 400);
       if (snapshot.stats?.levels > previous.stats?.levels) {
         flash(document.getElementById('level-up'), 'level-visible', reduced() ? 1500 : 2400);
