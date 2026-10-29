@@ -69,34 +69,24 @@ class Validation(unittest.TestCase):
 
 class Payload(unittest.TestCase):
     def test_embed_fields_and_no_mentions(self):
-        body = webhook.payload("completed", "Reached the stop time", {
-            "elapsed": 3725, "level": 500, "levels": 25, "deaths": 41, "senzus": 37,
-            "ults": 999, "blasts": 999, "time_left": 60,
-        })
+        body = webhook.payload("completed", "Reached the stop time", {"elapsed": 3725, "deaths": 41, "ults": 37, "blasts": 2}, 60)
         self.assertEqual(body["allowed_mentions"], {"parse": []})
         embed = body["embeds"][0]
         self.assertEqual(embed["title"], "Session finished")
-        fields = {field["name"]: field["value"] for field in embed["fields"]}
-        self.assertEqual(fields, {"Level": "500", "Levels gained": "25", "Senzus eaten": "37", "Deaths": "41", "Run time": "1h 2m"})
+        fields = {f["name"]: f["value"] for f in embed["fields"]}
+        self.assertEqual(fields, {"Run time": "1h 2m", "Deaths": "41", "Ults fired": "37", "Ki blasts": "2", "GC time left": "1m 0s"})
 
-    def test_levels_gained_can_use_the_first_and_latest_readings(self):
-        body = webhook.payload("completed", "Reached the target level", {"elapsed": 60, "level": 203, "start_level": 178})
-        fields = {field["name"]: field["value"] for field in body["embeds"][0]["fields"]}
-        self.assertEqual(fields["Level"], "203")
-        self.assertEqual(fields["Levels gained"], "25")
-        body = webhook.payload("progress", "Still levelling", {})
-        self.assertTrue(all(field["value"] == "--" for field in body["embeds"][0]["fields"]))
+    def test_level_field_when_levels_were_read(self):
+        body = webhook.payload("completed", "Reached the stop time", {"elapsed": 60, "level": 203, "start_level": 178})
+        fields = {f["name"]: f["value"] for f in body["embeds"][0]["fields"]}
+        self.assertEqual(fields["Level"], "178 → 203 (+25)")
+        body = webhook.payload("completed", "Reached the stop time", {"elapsed": 60})
+        self.assertNotIn("Level", {f["name"] for f in body["embeds"][0]["fields"]})
 
-    def test_bad_numbers_and_private_stats_never_enter_the_embed(self):
-        private = r"C:\Users\someone\secret.txt"
-        body = webhook.payload("stopped", "Stopped", {"elapsed": float("nan"), "level": private,
-            "levels": True, "deaths": "x", "senzus": 1e30, "name": "private-name", "path": private})
-        fields = {field["name"]: field["value"] for field in body["embeds"][0]["fields"]}
-        self.assertEqual(fields, {"Level": "--", "Levels gained": "--", "Senzus eaten": "10000000", "Deaths": "--", "Run time": "--"})
-        self.assertNotIn(private, json.dumps(body))
-        self.assertNotIn("private-name", json.dumps(body))
-        body = webhook.payload("progress", "Still levelling", {"elapsed": 0, "level": 0, "levels": 0, "deaths": 0, "senzus": 0})
-        self.assertEqual([field["value"] for field in body["embeds"][0]["fields"]], ["0", "0", "0", "0", "0m 0s"])
+    def test_bad_numbers_dont_break_the_embed(self):
+        body = webhook.payload("stopped", "Stopped", {"elapsed": float("nan"), "deaths": "x", "ults": -5, "blasts": 1e30})
+        values = [f["value"] for f in body["embeds"][0]["fields"]]
+        self.assertEqual(values[:4], ["0m 0s", "0", "0", "10000000"])
 
     def test_unknown_kind_rejected(self):
         with self.assertRaises(ValueError):
@@ -109,16 +99,9 @@ class Classify(unittest.TestCase):
         self.assertEqual((kind, label), ("attention", "Macro error"))
 
     def test_known_reasons(self):
-        cases = {"Stopped: Roblox disconnected you (idle kick, lost connection or server kick)": ("attention", "Roblox disconnected"),
-                 "Stopped: ran for 30 min": ("completed", "Reached the stop time"),
-                 "Stopped: reached level 801": ("completed", "Reached the target level"),
-                 "Stopped: Senzu inventory empty": ("attention", "Senzu beans need attention"),
-                 "Stopped: training failed": ("attention", "Training failed"),
-                 "Stopped: training wouldn't start (no training points left?)": ("attention", "Training couldn't start"),
-                 "Stopped: not in the Gravity Chamber (the daily training limit may be used up)": ("attention", "Left the Gravity Chamber"),
-                 "Stopped: error: reached level 801": ("attention", "Macro error"),
-                 "Stopped: ran for 30 min, error": ("attention", "Macro error"),
-                 "Stopped: 59s (59s) left": ("stopped", "Stopped"),
+        cases = {"Stopped: 59s (59s) left": ("completed", "Reached the stop time"),
+                 "Stopped: Roblox disconnected you (idle kick, lost connection or server kick)": ("attention", "Roblox disconnected"),
+                 "Stopped: slot 7 is empty. Put an ult there or pick Auto": ("attention", "Ult slot empty"),
                  "Stopped": ("stopped", "Stopped")}
         for reason, expected in cases.items():
             self.assertEqual(webhook.classify(reason, False), expected, reason)
@@ -166,11 +149,11 @@ class Delivery(unittest.TestCase):
     def test_progress_interval(self):
         self.hook.configure({"url": GOOD, "enabled": True, "progress_minutes": 5})
         self.hook.begin_run()
-        self.hook.maybe_progress({})
+        self.hook.maybe_progress({}, None)
         self.drain()
         self.assertEqual(self.sent, [])
         self.hook._next_progress = time.monotonic() - 1
-        self.hook.maybe_progress({"elapsed": 300})
+        self.hook.maybe_progress({"elapsed": 300}, 6900)
         self.drain()
         self.assertEqual(self.sent[0][1]["embeds"][0]["title"], "Levelling in progress")
 
@@ -188,7 +171,7 @@ class Review2(unittest.TestCase):
         self.hook.configure({"url": GOOD, "enabled": True, "progress_minutes": 0})
         self.hook.begin_run()
         self.hook.configure({"progress_minutes": 5})
-        self.hook.maybe_progress({})
+        self.hook.maybe_progress({}, None)
         self.assertTrue(self.hook.flush(1))
         self.assertEqual(self.sent, [])
 

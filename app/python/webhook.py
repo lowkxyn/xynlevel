@@ -17,7 +17,7 @@ from ctypes import wintypes
 from datetime import datetime, timezone
 from pathlib import Path
 
-VERSION = "1.0.1"
+VERSION = "1.0.0"
 PROGRESS_CHOICES = (0, 5, 10, 15, 30, 60)
 # PTB, Canary and discordapp.com links work on discord.com, which is the only host ever contacted.
 _WEBHOOK = re.compile(r"https://(?:(?:ptb|canary)\.)?discord(?:app)?\.com(/api/webhooks/[0-9]{5,24}/[A-Za-z0-9_-]{20,200})")
@@ -28,17 +28,16 @@ TITLES = {"completed": "Session finished", "progress": "Levelling in progress", 
 
 # Bot stop reasons -> (kind, label). First matching prefix/substring wins; anything else is generic.
 _RESULTS = (
+    ("left", "completed", "Reached the stop time"),
     ("disconnected", "attention", "Roblox disconnected"),
     ("Roblox not found", "attention", "Roblox wasn't open"),
     ("window closed", "attention", "Roblox closed"),
     ("game area is", "attention", "Window size changed"),
+    ("GC timer", "attention", "Left the Gravity Chamber"),
     ("GC screen", "attention", "Left the Gravity Chamber"),
-    ("not in the Gravity Chamber", "attention", "Left the Gravity Chamber"),
-    ("training wouldn't start", "attention", "Training couldn't start"),
-    ("Senzu", "attention", "Senzu beans need attention"),
+    ("is empty", "attention", "Ult slot empty"),
     ("Respawn didn't respond", "attention", "Respawn stuck"),
     ("error", "attention", "Macro error"),
-    ("failed", "attention", "Training failed"),
 )
 
 
@@ -46,12 +45,8 @@ def classify(reason, manual_stop):
     if manual_stop:
         return "stopped", "Stopped by you"
     text = str(reason)
-    if re.fullmatch(r"Stopped: ran for \d+ min", text):
-        return "completed", "Reached the stop time"
-    if re.fullmatch(r"Stopped: reached level \d+", text):
-        return "completed", "Reached the target level"
     for needle, kind, label in _RESULTS:
-        if needle.casefold() in text.casefold():
+        if needle in text:
             return kind, label
     return "stopped", "Stopped"
 
@@ -83,26 +78,21 @@ def _crypt(data, protect):
 # ---------------- payload ----------------
 
 def _int(value):
-    if type(value) not in (int, float) or not math.isfinite(value) or value < 0:
-        return None
-    return int(min(value, 10 ** 7))
-
-
-def _count(value):
-    number = _int(value)
-    return "--" if number is None else str(number)
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return 0
+    return int(max(0, min(number, 10 ** 7))) if math.isfinite(number) else 0
 
 
 def _duration(seconds):
     seconds = _int(seconds)
-    if seconds is None:
-        return "--"
     hours, rest = divmod(seconds, 3600)
     minutes, secs = divmod(rest, 60)
     return f"{hours}h {minutes}m" if hours else f"{minutes}m {secs}s"
 
 
-def payload(kind, label=None, stats=None):
+def payload(kind, label=None, stats=None, time_left=None):
     if kind not in TITLES:
         raise ValueError("Unknown notification kind")
     stats = stats if isinstance(stats, dict) else {}
@@ -117,14 +107,15 @@ def payload(kind, label=None, stats=None):
     else:
         if label:
             embed["description"] = f"**{label}**"
-        levels = stats.get("levels")
-        if levels is None and _int(stats.get("level")) is not None and _int(stats.get("start_level")) is not None:
-            levels = stats["level"] - stats["start_level"]
-        fields = [{"name": "Level", "value": _count(stats.get("level")), "inline": True},
-                  {"name": "Levels gained", "value": _count(levels), "inline": True},
-                  {"name": "Senzus eaten", "value": _count(stats.get("senzus")), "inline": True},
-                  {"name": "Deaths", "value": _count(stats.get("deaths")), "inline": True},
-                  {"name": "Run time", "value": _duration(stats.get("elapsed")), "inline": True}]
+        fields = [{"name": "Run time", "value": _duration(stats.get("elapsed")), "inline": True},
+                  {"name": "Deaths", "value": str(_int(stats.get("deaths"))), "inline": True},
+                  {"name": "Ults fired", "value": str(_int(stats.get("ults"))), "inline": True},
+                  {"name": "Ki blasts", "value": str(_int(stats.get("blasts"))), "inline": True}]
+        if stats.get("level") is not None and stats.get("start_level") is not None:
+            level, start = _int(stats.get("level")), _int(stats.get("start_level"))
+            fields.insert(1, {"name": "Level", "value": f"{start} → {level} (+{max(0, level - start)})", "inline": True})
+        if time_left is not None:
+            fields.append({"name": "GC time left", "value": _duration(time_left), "inline": True})
         embed["fields"] = fields
     return {"username": "XynLevel", "allowed_mentions": {"parse": []}, "embeds": [embed]}
 
@@ -226,7 +217,7 @@ class Webhook:
         with self._lock:
             self._next_progress = time.monotonic() + self._settings["progress_minutes"] * 60
 
-    def maybe_progress(self, stats):
+    def maybe_progress(self, stats, time_left):
         """Called often from the bridge loop; never blocks on a busy lock."""
         if not self._lock.acquire(blocking=False):
             return
@@ -237,9 +228,9 @@ class Webhook:
             self._next_progress = time.monotonic() + interval
         finally:
             self._lock.release()
-        self.send("progress", "Still levelling", stats)
+        self.send("progress", "Still levelling", stats, time_left)
 
-    def send(self, kind, label=None, stats=None):
+    def send(self, kind, label=None, stats=None, time_left=None):
         with self._lock:
             if not self._settings["url"] or (kind != "test" and not self._settings["enabled"]):
                 return False
@@ -247,7 +238,7 @@ class Webhook:
                 self.status = "Discord rate limit: reports paused for up to 5 minutes"
                 return False
             try:
-                self._queue.put_nowait((self._generation, payload(kind, label, stats)))
+                self._queue.put_nowait((self._generation, payload(kind, label, stats, time_left)))
             except queue.Full:
                 self.status = "Report queue full; message skipped"
                 return False

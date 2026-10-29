@@ -17,7 +17,7 @@ body:
     id: version
     attributes:
       label: XynLevel version
-      placeholder: "1.0.1"
+      placeholder: "1.0.0"
     validations:
       required: true
   - type: input

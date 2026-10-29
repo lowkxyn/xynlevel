@@ -18,7 +18,7 @@
 <header class="navigation-header">
 <div class="dock-brand">
 <div class="brand-mark"></div>
-<div class="brand-info"><span class="brand-name">XynLevel</span><span class="brand-ver" id="version">1.0.1</span></div>
+<div class="brand-info"><span class="brand-name">XynLevel</span><span class="brand-ver" id="version">1.0.0</span></div>
 </div>
 <nav aria-label="Pages" class="navigation-dock" id="navigation-dock">
 <span aria-hidden="true" class="dial-rail"></span>
@@ -49,13 +49,13 @@
 <p aria-live="polite" class="run-status" id="status" role="status">Connecting...</p>
 <div class="run-panel">
 <div class="stat-row stat-row-3">
-<div class="stat-card"><div class="stat-label">Run time</div><output class="stat-value" data-stat="elapsed" id="run-time">--</output><div aria-label="Run time unavailable" class="stat-bar empty" id="gauge" role="img"><div class="stat-bar-fill" id="time-progress"></div></div><div class="run-subline" id="run-time-state">press Start run</div></div>
-<div class="stat-card level-card"><div class="stat-label">Level</div><div class="level-line"><output class="stat-value" id="run-level">--</output><span class="level-percent" id="run-level-percent">--</span></div><div aria-label="Level progress unavailable" class="stat-bar empty" id="level-gauge" role="img"><div class="stat-bar-fill" id="level-progress"></div></div></div>
-<div class="stat-card"><div class="stat-label">Health points left</div><output class="stat-value" id="run-points">--</output><div class="run-subline">Health minigame</div></div>
+<div class="stat-card"><div class="stat-label">GC time left</div><output class="stat-value" id="time-left">--:--</output><div aria-label="Time left unavailable" class="stat-bar" id="gauge" role="img"><div class="stat-bar-fill" id="time-progress"></div></div></div>
+<div class="stat-card"><div class="stat-label">Run time</div><output class="stat-value" data-stat="elapsed" id="run-time">--:--</output><div class="run-subline" id="run-time-state">press Start run</div></div>
+<div class="stat-card level-card"><div class="stat-label">Level</div><div class="level-line"><output class="stat-value" id="run-level">--</output><span class="level-percent" id="run-level-percent">Reads during the run</span></div><div aria-label="Level progress unavailable" class="stat-bar empty" id="level-gauge" role="img"><div class="stat-bar-fill" id="level-progress"></div></div></div>
 </div>
 <div class="section-title">Run stats</div>
 <div class="panel panel-static">
-<div class="telemetry"><div aria-label="Run statistics" class="telem-row" id="run-stats"></div><div class="telem-card gravity-card"><div class="telem-label">Gravity</div><div class="gravity-value-row"><output class="telem-value" id="run-gravity">--</output><a aria-label="Edit gravity" class="gravity-edit" data-open-setting="gravity_mode" href="#settings">Edit</a></div><div class="telem-sub" id="run-gravity-hint">EXP multiplier</div></div></div>
+<div class="telemetry"><div aria-label="Reported run statistics" class="telem-row" hidden="" id="run-stats"></div><div id="stats-empty" aria-label="No run statistics reported"><div class="telem-card"><div class="telem-label">Ults fired</div><span class="telem-value">&mdash;</span><span class="telem-sub">no run yet</span></div><div class="telem-card"><div class="telem-label">Deaths</div><span class="telem-value">&mdash;</span><span class="telem-sub">no run yet</span></div><div class="telem-card"><div class="telem-label">Ki blasts</div><span class="telem-value">&mdash;</span><span class="telem-sub">no run yet</span></div></div><div class="telem-card gravity-card"><div class="telem-label">Gravity</div><div class="gravity-value-row"><output class="telem-value" id="run-gravity">100G</output><a aria-label="Edit gravity" class="gravity-edit" data-open-setting="gravity" href="#settings">Edit</a></div><div class="telem-sub" id="run-gravity-hint">set at start</div></div></div>
 </div>
 <div id="level-up" role="status">LEVEL UP</div></div></section>
 <section class="page view" hidden="" id="settings">
@@ -69,52 +69,168 @@
 <div class="warning" hidden="" id="settings-warning" role="alert">
 </div>
 <div aria-label="Settings sections" class="section-nav" role="group">
-<button class="btn-sm" data-section="training">Training</button>
-<button class="btn-sm" data-section="senzu">Senzu</button>
+<button class="btn-sm" data-section="attack">Attack</button>
+<button class="btn-sm" data-section="movement">Movement</button>
+<button class="btn-sm" data-section="chamber">Chamber</button>
 <button class="btn-sm" data-section="stopping">Stopping</button>
 <button class="btn-sm" data-section="appearance">Appearance</button>
 <button class="btn-sm" data-section="notifications">Notifications</button>
 </div>
-<section class="settings-section" id="section-training" tabindex="-1">
-<h2 class="section-title">Training</h2>
+<section class="settings-section" id="section-attack" tabindex="-1">
+<h2 class="section-title">Attack</h2>
 <div class="panel">
 <div class="row-item">
-<label class="row-label" for="gravity_mode" id="gravity_mode-label">Gravity</label>
-<div class="row-ctrl"><select class="inp" data-segmented="" data-setting="" id="gravity_mode">
-<option value="max">Max unlocked</option>
-<option value="custom">Custom</option>
-</select></div></div>
-<div class="setting-dependent" data-depends="gravity_mode" data-depends-value="custom" data-hide-disabled="" hidden=""><div class="row-item">
-<label class="row-label" for="gravity" id="gravity-label">Custom gravity</label>
-<div class="row-ctrl"><div class="number-unit"><input class="inp" data-setting="" id="gravity" max="500" min="1" step="1" type="number"/><span>G</span></div></div></div></div>
-<div class="row-hint">Higher gravity gives much more EXP but drains HP. Senzu beans keep you alive.</div>
+<label class="row-label" for="attack" id="attack-label">Attack mode
+</label>
+
+<div class="row-ctrl"><select class="inp" data-segmented="" data-setting="" id="attack">
+<option value="auto">Auto</option>
+<option value="blasts">Blasts</option>
+<option value="ult">Ult</option>
+</select></div></div><div class="row-hint">Auto uses your ult when available, otherwise Ki blasts.</div>
+<div class="row-item">
+<label class="row-label" for="ult_slot" id="ult_slot-label">Ult slot
+</label>
+
+<div class="row-ctrl"><select class="inp" data-segmented="" data-setting="" id="ult_slot">
+<option value="7">7</option>
+<option value="8">8</option>
+</select></div></div><div class="row-hint">Choose an ult that hits the room.</div>
+<div class="row-item">
+<label class="row-label" for="blast_interval" id="blast_interval-label">Blast interval
+</label>
+
+<div class="row-ctrl"><div class="xyn-controls interval">
+<input aria-label="Blast interval slider" class="setting-slider" data-range-for="blast_interval" max="2" min="0.05" step="0.05" type="range"/>
+<div class="number-unit">
+<input class="inp" data-setting="" id="blast_interval" max="60" min="0.05" step="0.05" type="number"/>
+<span>s</span>
+</div>
+</div></div></div><div class="row-hint">Time between Ki blasts. Up to 60 s in the number field.</div>
+<div class="row-item">
+<label class="row-label" for="scroll_interval" id="scroll_interval-label">Scroll interval
+</label>
+
+<div class="row-ctrl"><div class="xyn-controls interval">
+<input aria-label="Scroll interval slider" class="setting-slider" data-range-for="scroll_interval" max="2" min="0.05" step="0.05" type="range"/>
+<div class="number-unit">
+<input class="inp" data-setting="" id="scroll_interval" max="60" min="0.05" step="0.05" type="number"/>
+<span>s</span>
+</div>
+</div></div></div><div class="row-hint">Time between target switches. Up to 60 s in the number field.</div>
+<div class="row-item">
+<label class="row-label" for="ult_jump" id="ult_jump-label">Jump when firing ults
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="ult_jump" role="switch" type="checkbox"/></div></div><div class="row-hint">Run, hop and fire in the air, then land and charge.</div>
+<div class="row-item">
+<label class="row-label" for="ceiling_aim" id="ceiling_aim-label">Aim ults at the ceiling
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="ceiling_aim" role="switch" type="checkbox"/></div></div><div class="row-hint">Each life: zoom out and tilt the camera up before charging.</div>
 </div>
 </section>
-<section class="settings-section" id="section-senzu" tabindex="-1">
-<h2 class="section-title">Senzu</h2>
+<section class="settings-section" id="section-movement" tabindex="-1">
+<h2 class="section-title">Movement</h2>
 <div class="panel">
 <div class="row-item">
-<label class="row-label" for="auto_senzu" id="auto_senzu-label">Auto Senzu</label>
-<div class="row-ctrl"><input class="toggle" data-setting="" id="auto_senzu" role="switch" type="checkbox"/></div></div>
-<div class="setting-dependent" data-depends="auto_senzu"><div class="row-item">
-<label class="row-label" for="senzu_at" id="senzu_at-label">Eat at HP</label>
-<div class="row-ctrl"><div class="xyn-controls interval">
-<input aria-label="Eat at HP slider" class="setting-slider" data-range-for="senzu_at" max="90" min="10" step="1" type="range"/>
-<div class="number-unit"><input class="inp" data-setting="" id="senzu_at" max="90" min="10" step="1" type="number"/><span>%</span></div>
-</div></div></div><div class="row-hint">Eat a Senzu when HP falls to this percent.</div></div>
+<label class="row-label" for="movement" id="movement-label">Movement
+</label>
+
+<div class="row-ctrl"><select class="inp" data-segmented="" data-setting="" id="movement">
+<option value="off">Off</option>
+<option value="w">W</option>
+<option value="wa">W+A</option>
+<option value="wd">W+D</option>
+<option value="circle">Circle</option>
+</select></div></div><div class="row-hint">Ki blasts only. Charging 4x Kamehameha stays still.</div>
+<div class="setting-dependent" data-depends="movement"><div class="row-item">
+<label class="row-label" for="sprint" id="sprint-label">Sprint
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="sprint" role="switch" type="checkbox"/></div></div><div class="row-hint">Hold Shift while moving.</div></div>
+<div class="row-item">
+<label class="row-label" for="blast_jump" id="blast_jump-label">Jump while blasting
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="blast_jump" role="switch" type="checkbox"/></div></div><div class="row-hint">Double hop every 1.2-2 s while firing Ki blasts.</div>
+<div class="row-item">
+<label class="row-label" for="relock" id="relock-label">Re-lock now and then
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="relock" role="switch" type="checkbox"/></div></div><div class="row-hint">Retake lock-on every 8-15 s when target switching stalls.</div>
+</div>
+</section>
+<section class="settings-section" id="section-chamber" tabindex="-1">
+<h2 class="section-title">Chamber</h2>
+<div class="panel">
+<div class="row-item">
+<label class="row-label" for="auto_gravity" id="auto_gravity-label">Auto gravity
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="auto_gravity" role="switch" type="checkbox"/></div></div><div class="row-hint">Set gravity once at the start of each run.</div>
+<div class="setting-dependent" data-depends="auto_gravity"><div class="row-item">
+<label class="row-label" for="gravity" id="gravity-label">Gravity</label>
+
+<div class="row-ctrl"><div class="xyn-controls">
+<input class="setting-slider" data-range-for="gravity" data-setting="" id="gravity" max="100" min="0" step="10" type="range"/>
+<output class="xyn-mono" id="gravity-value">100G</output>
+</div></div></div></div>
+<div class="row-item">
+<label class="row-label" for="hide_chat" id="hide_chat-label">Hide chat
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="hide_chat" role="switch" type="checkbox"/></div></div><div class="row-hint">Keep chat from covering the HP and Ki bars.</div>
+<div class="row-item">
+<label class="row-label" for="auto_buy" id="auto_buy-label">Auto-buy 4x Kamehameha
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="auto_buy" role="switch" type="checkbox"/></div></div><div class="row-hint">While dead. Requires level 135 and 5,000 Zeni.</div>
+<div class="setting-dependent" data-depends="auto_buy"><div class="row-item">
+<label class="row-label" for="replace_slot" id="replace_slot-label">Replace slot move
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="replace_slot" role="switch" type="checkbox"/></div></div><div class="row-hint">Replace another move in your selected ult slot.</div></div>
+<div class="setting-dependent" data-depends="replace_slot"><div class="row-item">
+<label class="row-label" for="restore_slot" id="restore_slot-label">Put the old move back at the end
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="restore_slot" role="switch" type="checkbox"/></div></div><div class="row-hint">Re-equips the replaced move when the run ends.</div></div>
+<div class="row-item">
+<label class="row-label" for="ki_control_spend" id="ki_control_spend-label">Spend skill points on Ki Control
+</label>
+
+<div class="row-ctrl"><input aria-describedby="ki_control_spend-hint" class="toggle" data-setting="" id="ki_control_spend" role="switch" type="checkbox"/></div></div><div class="row-hint" id="ki_control_spend-hint">While dead, spends points on Ki Control until it reaches the target. Spent points are permanent.</div>
+<div class="setting-dependent" data-depends="ki_control_spend"><div class="row-item">
+<label class="row-label" for="ki_control_target" id="ki_control_target-label">Ki Control output target</label>
+
+<div class="row-ctrl"><div class="number-unit">
+<input class="inp" data-setting="" id="ki_control_target" max="5000" min="1" step="1" type="number"/>
+</div></div></div></div>
 </div>
 </section>
 <section class="settings-section" id="section-stopping" tabindex="-1">
 <h2 class="section-title">Stopping</h2>
 <div class="panel">
 <div class="row-item">
-<label class="row-label" for="stop_after_minutes" id="stop_after_minutes-label">Stop after</label>
-<div class="row-ctrl"><div class="number-unit"><input class="inp" data-setting="" id="stop_after_minutes" max="10080" min="0" step="1" type="number"/><span>min</span></div></div></div><div class="row-hint">0 = off.</div>
-<div class="row-item">
-<label class="row-label" for="stop_at_level" id="stop_at_level-label">Stop at level</label>
-<div class="row-ctrl"><input class="inp" data-setting="" id="stop_at_level" max="100000" min="0" step="1" type="number"/></div></div><div class="row-hint">0 = off.</div>
+<label class="row-label" for="stop_enabled" id="stop_enabled-label">Stop at time left
+</label>
+
+<div class="row-ctrl"><input class="toggle" data-setting="" id="stop_enabled" role="switch" type="checkbox"/></div></div><div class="row-hint">End the run when the chamber timer reaches your threshold.</div>
+<div class="setting-dependent" data-depends="stop_enabled"><div class="row-item">
+<label class="row-label" for="stop_at_seconds" id="stop_at_seconds-label">Threshold</label>
+
+<div class="row-ctrl"><div class="xyn-controls">
+<div class="number-unit">
+<input class="inp" data-setting="" id="stop_at_seconds" max="604800" min="0" step="1" type="number"/>
+<span>s</span>
+</div>
+<output class="xyn-mono" id="stop-pretty">1m 0s</output>
+</div></div></div></div>
 <div class="row-item" id="after-row">
-<label class="row-label" for="after_run">After the run</label>
+<label class="row-label" for="after_run">After reaching the threshold
+</label>
+
 <div class="row-ctrl"><select class="inp" data-setting="" id="after_run">
 <option value="none">Do nothing</option>
 <option value="close_app">Close XynLevel</option>
@@ -207,7 +323,7 @@
 <label class="row-label" for="sound" id="sound-label">Sound when the run ends
 </label>
 
-<div class="row-ctrl"><input class="toggle" data-setting="" id="sound" role="switch" type="checkbox"/></div></div><div class="row-hint">Plays when a stopping limit is reached.</div>
+<div class="row-ctrl"><input class="toggle" data-setting="" id="sound" role="switch" type="checkbox"/></div></div><div class="row-hint">Plays when the stop time is reached.</div>
 </div>
 <h3 class="section-title">Discord reports</h3>
 <div class="panel" id="webhook-panel">
@@ -223,7 +339,7 @@
 <label class="row-label" for="webhook-enabled">Send run reports
 </label>
 
-<div class="row-ctrl"><input class="toggle" id="webhook-enabled" role="switch" type="checkbox"/></div></div><div class="row-hint">Finished, stopped and needs-attention runs, with levels, Senzus eaten, deaths and run time.</div>
+<div class="row-ctrl"><input class="toggle" id="webhook-enabled" role="switch" type="checkbox"/></div></div><div class="row-hint">Finished, stopped and needs-attention runs, with run time, deaths and ults.</div>
 <div class="row-item">
 <label class="row-label" for="webhook-progress">Progress updates
 </label>
@@ -265,10 +381,10 @@
 </div>
 <div class="section-title">Troubleshooting</div>
 <div class="panel panel-static">
-<div class="tip-row"><span class="tip-label">Before starting</span><span class="tip-val">Stand in the Gravity Chamber, then start.</span></div>
+<div class="tip-row"><span class="tip-label">Before starting</span><span class="tip-val">Stand in the Gravity Chamber bot room. Alive or dead is fine.</span></div>
 <div class="tip-row"><span class="tip-label">Won't start</span><span class="tip-val">Open Roblox first. F6 only starts a run while Roblox is the active window.</span></div>
 <div class="tip-row"><span class="tip-label">Lost focus</span><span class="tip-val">Losing focus pauses the run. Return to Roblox and it carries on; the status reads Paused meanwhile.</span></div>
-<div class="tip-row"><span class="tip-label">Senzu beans</span><span class="tip-val">Keep Senzu beans in your inventory and turn on Auto Senzu in Settings.</span></div>
+<div class="tip-row"><span class="tip-label">No ults</span><span class="tip-val">Check the ult slot (7 or 8) in Settings and that the move is equipped. Auto falls back to Ki blasts.</span></div>
 </div>
 </section><section class="page view" hidden="" id="tools">
 <div class="page-header">
@@ -313,7 +429,7 @@
 </div>
 </section><section class="page view" hidden="" id="stats">
 <div class="page-header"><h1>Stats</h1><p>Current session and latest run</p><a class="dial-neighbour dial-prev" href="#tools">&#8249; Tools</a></div>
-<div class="stats-panel"><div aria-label="Session statistics" class="session-grid" id="session-stats"></div><a class="session-rule" data-open-setting="stop_after_minutes" href="#settings"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 6v6l4 2"></path></svg><span>Stop after</span><output class="context-value" id="session-stop-at">Off</output></a><a class="session-rule" data-open-setting="stop_at_level" href="#settings"><span>Stop at level</span><output class="context-value" id="session-stop-level">Off</output></a><p class="session-note" id="session-note">Start a run to collect statistics. Level readings appear when available.</p></div>
+<div class="stats-panel"><div aria-label="Session statistics" class="session-grid" id="session-stats"></div><a class="session-rule" data-open-setting="stop_at_seconds" href="#settings"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 6v6l4 2"></path></svg><span>Stop at time left</span><output class="context-value" id="session-stop-at">Off</output></a><p class="session-note" id="session-note">Start a run to collect statistics. Level readings appear when available.</p></div>
 </section></div></main>
 
 </div>
@@ -362,6 +478,6 @@
 <button class="btn-primary btn-sm" id="report-save">Save bundle</button>
 </div>
 </dialog></div>
-
+<template id="respawn-learning-template"><div class="respawn-context" title="The bot automatically learns its respawn delay. This is its mode, not a measured timing."><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" viewBox="0 0 24 24"><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"></path></svg><span>Respawn learning</span><span class="context-value">Auto</span></div></template>
 </body>
 </html>

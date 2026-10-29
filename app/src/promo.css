@@ -11,10 +11,10 @@
 .context-value{margin-left:auto;color:var(--text);font-family:var(--font-mono)}
 .run-settings-link:focus-visible{outline:2px solid var(--accent-text);outline-offset:4px;border-radius:12px}
 .gravity-edit{font:600 10px var(--font-ui);text-decoration:none;margin-left:auto;border:1px solid var(--border);border-radius:999px;padding:3px 8px;color:var(--text);background:var(--bg-input)}
-.gravity-value-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gravity-value-row{display:flex;align-items:center;gap:8px}
 .stats-panel{background:var(--bg-alt);border:1px solid var(--border);border-radius:18px;padding:20px 22px}
 .session-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.session-grid .telem-card:last-child{grid-column:1/-1}
+.session-grid .session-level{grid-column:1/-1}
 .session-grid .telem-card{min-height:100px}
 .session-note{font-size:11.5px;color:var(--text3);line-height:1.7;margin-top:16px;padding:10px 14px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px}
 .respawn-context,.session-rule{display:flex;align-items:center;gap:9px;color:var(--text3)}
@@ -67,7 +67,7 @@
   & .run-subline{font-size:calc(11 * var(--promo-unit));margin-top:calc(8 * var(--promo-unit))}
   & .stat-bar{height:calc(5 * var(--promo-unit));margin-top:calc(12 * var(--promo-unit))}
   & .telemetry,& .telemetry .telem-row,& #stats-empty{gap:calc(14 * var(--promo-unit))}
-  & .gravity-card{flex-basis:calc((100% - 28 * var(--promo-unit))/3)}
+  & .gravity-card{flex-basis:calc((100% - 42 * var(--promo-unit))/4)}
   & .telem-card{min-height:calc(98 * var(--promo-unit));padding:calc(14 * var(--promo-unit)) calc(16 * var(--promo-unit));border-radius:calc(14 * var(--promo-unit))}
   & .telem-value{font-size:calc(22 * var(--promo-unit))}
   & .telem-sub{font-size:calc(11 * var(--promo-unit));margin-top:calc(8 * var(--promo-unit))}

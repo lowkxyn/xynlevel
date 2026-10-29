@@ -70,7 +70,7 @@
   & .stat-row + .section-title + .panel{background:none;border:0;border-radius:0;overflow:visible}
   & .telemetry{padding:0;gap:14px}
   & .telemetry .telem-row,& #stats-empty{gap:14px}
-  & .gravity-card{flex-basis:calc((100% - 28px)/3)}
+  & .gravity-card{flex-basis:calc((100% - 42px)/4)}
   & .telem-card{border-radius:14px;background:var(--bg-card);border:1px solid var(--border-light);padding:14px 16px;gap:0;min-width:0;min-height:98px}
   & .telem-value{font:600 22px/1 var(--font-mono);color:var(--text);font-variant-numeric:tabular-nums}
   & .telem-sub{font:400 11px var(--font-ui);color:var(--text3);margin-top:8px}

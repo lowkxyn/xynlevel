@@ -6,13 +6,11 @@ import { DEFAULTS } from './settings.js';
 const read = name => readFileSync(new URL(name, import.meta.url), 'utf8');
 const html = read('./index.html');
 const tags = [...html.matchAll(/<[^!][^>]*>/g)].map(match => match[0]);
+// Removed on purpose (2026-10-25 review): repeated status blocks, the input recorder and the separate
+// notification-permission button. Everything else from earlier rounds must stay.
 const REMOVED = new Set(['run-dot', 'run-state', 'run-window', 'run-set-window', 'summary-attack', 'summary-stop', 'run-chips',
   'footer-state', 'footer-time', 'connection-dot', 'connection', 'hotkey-status', 'input-log', 'notification-access',
-  'check-found', 'check-found-icon', 'check-size', 'check-size-icon', 'section-attack', 'section-movement', 'section-chamber',
-  'gravity-value', 'stop-pretty', 'ki_control_spend-hint', 'time-left', 'stats-empty', 'respawn-learning-template',
-  ...['attack', 'ult_slot', 'blast_interval', 'scroll_interval', 'stop_enabled', 'stop_at_seconds', 'movement', 'relock',
-    'hide_chat', 'auto_gravity', 'sprint', 'blast_jump', 'ult_jump', 'auto_buy', 'replace_slot', 'restore_slot', 'ceiling_aim',
-    'ki_control_spend', 'ki_control_target'].flatMap(key => [key, `${key}-label`])]);
+  'check-found', 'check-found-icon', 'check-size', 'check-size-icon']);
 const attribute = (tag, name) => tag.match(new RegExp(`\\b${name}="([^"]*)"`))?.[1];
 
 test('every persisted setting has exactly one field; every literal controller target exists', () => {
@@ -63,7 +61,7 @@ test('top navigation keeps five real routes and both live skin controls', () => 
   assert.match(html, /data-depends="nav_style" data-depends-value="dial"/);
 });
 
-test('Run actions and unrelated content retain their controller IDs', () => {
+test('Run actions retain controller IDs and all original run content', () => {
   assert.match(html, /id="run-button"><span id="run-button-label">Start run<\/span><span aria-hidden="true" class="kbd run-kbd">F6<\/span>/);
   assert.match(html, /aria-label="Stop" class="btn-stop" disabled="" id="stop-button"/);
   assert.match(html, /class="stop-dot"/);
@@ -76,21 +74,15 @@ test('Run actions and unrelated content retain their controller IDs', () => {
   assert.match(read('./steel.css'), /\.xyn-app\[data-theme=dark\]\[data-ui=classic\]/);
 });
 
-test('training controls have the required bounds, labels and dependencies', () => {
-  assert.match(html, /for="gravity_mode" id="gravity_mode-label">Gravity/);
-  assert.ok(html.includes('Max unlocked'));
-  assert.ok(html.includes('Higher gravity gives much more EXP but drains HP. Senzu beans keep you alive.'));
-  assert.match(html, /data-depends="gravity_mode" data-depends-value="custom" data-hide-disabled="" hidden=""/);
-  assert.match(html, /data-depends="auto_senzu"/);
-  assert.match(html, /data-range-for="senzu_at"/);
-  for (const [id, min, max] of [['gravity', '1', '500'], ['senzu_at', '10', '90'], ['stop_after_minutes', '0', '10080'], ['stop_at_level', '0', '100000']]) {
-    const target = tags.find(tag => attribute(tag, 'id') === id);
-    for (const [key, value] of Object.entries({ type: 'number', min, max, step: '1' })) {
-      assert.equal(attribute(target, key), value, `${id}: ${key}`);
-    }
-  }
-  for (const id of ['attack', 'movement', 'auto_buy', 'stop_enabled', 'stop_at_seconds', 'ki_control_spend']) {
-    assert.ok(!tags.some(tag => attribute(tag, 'id') === id), `removed setting: ${id}`);
+test('new bot controls keep labels, bounds and dependent target wiring', () => {
+  const movement = html.slice(html.indexOf('id="section-movement"'), html.indexOf('id="section-chamber"'));
+  assert.match(movement, /for="blast_jump" id="blast_jump-label">Jump while blasting/);
+  assert.match(html, /for="ki_control_spend" id="ki_control_spend-label">Spend skill points on Ki Control/);
+  assert.ok(html.includes('While dead, spends points on Ki Control until it reaches the target. Spent points are permanent.'));
+  assert.match(html, /data-depends="ki_control_spend"/);
+  const target = tags.find(tag => attribute(tag, 'id') === 'ki_control_target');
+  for (const [key, value] of Object.entries({ type: 'number', min: '1', max: '5000', step: '1' })) {
+    assert.equal(attribute(target, key), value);
   }
 });
 
@@ -100,9 +92,7 @@ test('promo Run has the Level card and preserves diagnostics and extra window co
   assert.ok(run.includes('id="run-level"'));
   assert.ok(run.includes('id="level-gauge"'));
   assert.ok(run.includes('id="run-time-state"'));
-  assert.ok(run.includes('data-open-setting="gravity_mode"'));
-  assert.ok(run.includes('id="run-points"'));
-  assert.ok(!/GC time left|Ults fired|Ki blasts/.test(run));
+  assert.ok(run.includes('data-open-setting="gravity"'));
   assert.ok(!run.includes('Setup checklist'));
   assert.ok(run.includes('id="status"'), 'Run shows the latest status line');
   for (const id of ['set-window', 'game-size', 'window-hint']) assert.ok(window.includes(`id="${id}"`), `Window retains ${id}`);
@@ -110,8 +100,8 @@ test('promo Run has the Level card and preserves diagnostics and extra window co
   for (const id of ['compact', 'pin-toggle']) assert.ok(titlebar.includes(`id="${id}"`), `title bar has ${id}`);
   assert.match(read('./main.js'), /'run', 'settings', 'window', 'tools', 'stats'/);
   assert.ok(html.includes('id="session-stats"'));
-  assert.ok(html.includes('data-open-setting="stop_after_minutes"'));
-  assert.ok(html.includes('data-open-setting="stop_at_level"'));
+  assert.ok(html.includes('data-open-setting="stop_at_seconds"'));
+  assert.ok(html.includes('Respawn learning</span><span class="context-value">Auto'));
   const before = read('../_backup_promo_ui/src/index.html');
   for (const [, id] of [...before.matchAll(/\bid="([^"]+)"/g)].filter(([, id]) => !REMOVED.has(id))) assert.ok(tags.some(tag => attribute(tag, 'id') === id), `pre-promo ID retained: ${id}`);
 });

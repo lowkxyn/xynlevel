@@ -1,9 +1,10 @@
-import { DEFAULTS, loadSettings, resolveTheme, validateSettings } from './settings.js';
-import { mapState, ringState, statTiles } from './run-state.js';
+import { DEFAULTS, resolveTheme, validateSettings } from './settings.js';
+import { formatSeconds } from './format.js';
+import { mapState, ringState, statTiles, clockTime } from './run-state.js';
 import { setupControls, syncControls } from './controls.js';
 import { createMotion } from './motion.js';
 import { createNavigation } from './navigation.js';
-import { sessionMetrics } from './promo-state.js';
+import { sessionMetrics, chamberBar } from './promo-state.js';
 import { createTelemetryMotion, SNAPSHOT_INTERVAL_MS } from './telemetry-motion.js';
 import { setupWindowControls } from './window-controls.js';
 
@@ -79,11 +80,12 @@ function appearance() {
 }
 
 function fillSettings(value) {
-  settings = loadSettings(value);
+  settings = validateSettings(value);
   for (const input of document.querySelectorAll('[data-setting]')) {
     if (input.type === 'checkbox') input.checked = settings[input.id];
     else input.value = settings[input.id];
   }
+  $('stop-pretty').textContent = `(${formatSeconds(settings.stop_at_seconds)})`;
   syncControls();
   appearance();
 }
@@ -92,11 +94,13 @@ function collectSettings() {
   const value = {};
   for (const input of document.querySelectorAll('[data-setting]')) {
     if (input.type === 'checkbox') value[input.id] = input.checked;
-    else if (input.type === 'number') {
+    else if (['ult_slot', 'gravity', 'blast_interval', 'scroll_interval', 'stop_at_seconds', 'ki_control_target'].includes(input.id)) {
       input.classList.remove('invalid');
       input.removeAttribute('aria-invalid');
-      const outsideRange = input.validity.rangeUnderflow || input.validity.rangeOverflow;
-      if (input.value.trim() === '' || input.validity.badInput || outsideRange || !Number.isInteger(Number(input.value))) {
+      const outsideRange = input.id !== 'ki_control_target' && (input.validity.rangeUnderflow || input.validity.rangeOverflow);
+      const invalidInteger = (input.id === 'stop_at_seconds' && !Number.isSafeInteger(Number(input.value)))
+        || (input.id === 'ki_control_target' && !Number.isInteger(Number(input.value)));
+      if (input.value.trim() === '' || input.validity.badInput || outsideRange || invalidInteger) {
         input.classList.add('invalid');
         input.setAttribute('aria-invalid', 'true');
         throw new Error('Enter a valid number before saving');
@@ -118,6 +122,7 @@ async function saveSettings() {
       $('save-status').dataset.status = 'saving';
       await api('settings', draft);
       settings = draft;
+      if (!dirty) $('ki_control_target').value = settings.ki_control_target;
       appearance();
       await wc('pin', settings.always_on_top);
       $('save-status').textContent = 'Saved';
@@ -146,6 +151,10 @@ for (const input of document.querySelectorAll('[data-setting]')) {
     $('save-status').dataset.status = 'saving';
     // Appearance previews immediately; invalid drafts never reach the bridge.
     try { settings = collectSettings(); appearance(); } catch { /* Keep the last valid appearance. */ }
+    if (input.id === 'stop_at_seconds') {
+      const value = Number(input.value);
+      $('stop-pretty').textContent = input.value.trim() && Number.isSafeInteger(value) && value >= 0 && value <= 604800 ? `(${formatSeconds(value)})` : '(invalid number)';
+    }
   });
   input.addEventListener('change', saveSettings);
 }
@@ -179,8 +188,12 @@ navigate();
 
 function renderStats(stats) {
   const tiles = statTiles(stats);
-  const counters = tiles.filter(tile => ['senzus', 'deaths'].includes(tile.key));
+  $('run-time').textContent = tiles.find(tile => tile.key === 'elapsed')?.value || '--:--';
+  const counters = tiles.filter(tile => ['ults', 'deaths', 'blasts'].includes(tile.key));
   const container = $('run-stats');
+  container.hidden = !counters.length;
+  $('stats-empty').hidden = Boolean(counters.length);
+  for (const hint of $('stats-empty').querySelectorAll('.telem-sub')) hint.textContent = stats ? 'not reported' : 'no run yet';
   container.style.setProperty('--stat-count', Math.min(counters.length, 4));
   for (const child of [...container.children]) {
     if (!counters.some(tile => tile.key === child.dataset.key)) child.remove();
@@ -202,11 +215,11 @@ function renderStats(stats) {
       card.append(label, value, hint);
       container.append(card);
     }
-    const raw = stats?.[tile.key];
+    const raw = stats[tile.key];
     telemetry.number(card.querySelector('output'), typeof raw === 'number' && raw >= 0 ? Math.floor(raw) : null);
     card.querySelector('.stat-hint').textContent = tile.hint;
   }
-  const miniTiles = [['senzus', 's'], ['deaths', 'd']];
+  const miniTiles = [['deaths', 'd'], ['ults', 'u']].filter(([key]) => tiles.some(tile => tile.key === key));
   for (const child of [...$('mini-counters').children]) {
     if (!miniTiles.some(([key]) => key === child.dataset.key)) child.remove();
   }
@@ -219,14 +232,12 @@ function renderStats(stats) {
       counter.append(`${label} `, document.createElement('output'));
       $('mini-counters').append(counter);
     }
-    telemetry.number(counter.querySelector('output'), typeof stats?.[key] === 'number' && stats[key] >= 0 ? Math.floor(stats[key]) : null);
+    telemetry.number(counter.querySelector('output'), typeof stats[key] === 'number' && stats[key] >= 0 ? Math.floor(stats[key]) : null);
   }
   for (const element of document.querySelectorAll('.hud-counters')) element.hidden = !miniTiles.length;
   const metrics = sessionMetrics(stats);
   telemetry.number($('run-level'), typeof stats?.level === 'number' && stats.level >= 0 ? stats.level : null);
-  $('run-level-percent').textContent = metrics.xp !== null ? `${metrics.xp}% to next` : '--';
-  telemetry.number($('run-points'), typeof stats?.points_left === 'number' && stats.points_left >= 0 ? stats.points_left : null);
-  $('run-gravity').textContent = tiles.find(tile => tile.key === 'gravity').value;
+  $('run-level-percent').textContent = metrics.xp !== null ? `${metrics.xp}% to next` : stats ? 'XP not read yet' : 'Reads during the run';
   telemetry.progress($('level-progress'), metrics.xp === null ? null : metrics.xp / 100, { wrap: true });
   $('level-gauge').classList.toggle('empty', metrics.xp === null);
   $('level-gauge').setAttribute('aria-label', metrics.xp === null ? 'Level progress unavailable' : `${metrics.xp}% to next level`);
@@ -234,7 +245,7 @@ function renderStats(stats) {
     let card = $('session-stats').querySelector(`[data-session-stat="${metric.key}"]`);
     if (!card) {
       card = document.createElement('div');
-      card.className = 'telem-card';
+      card.className = `telem-card${metric.key === 'level-range' ? ' session-level' : ''}`;
       card.dataset.sessionStat = metric.key;
       const label = document.createElement('div');
       label.className = 'telem-label';
@@ -244,6 +255,7 @@ function renderStats(stats) {
       const hint = document.createElement('div');
       hint.className = 'telem-sub';
       card.append(label, value, hint);
+      if (metric.key === 'avg-life') card.append($('respawn-learning-template').content.cloneNode(true));
       $('session-stats').append(card);
     }
     const output = card.querySelector('output');
@@ -251,6 +263,9 @@ function renderStats(stats) {
       const value = typeof stats?.levels === 'number' ? stats.levels
         : typeof stats?.level === 'number' && typeof stats?.start_level === 'number' ? stats.level - stats.start_level : null;
       telemetry.number(output, value, number => number === null ? '--' : `${number > 0 ? '+' : ''}${Math.round(number).toLocaleString('en-GB')}`);
+    } else if (metric.key === 'level-range') {
+      const start = Number.isFinite(stats?.start_level) && stats.start_level >= 0 ? stats.start_level.toLocaleString('en-GB') : '--';
+      telemetry.number(output, stats?.level >= 0 ? stats.level : null, number => `${start} to ${number === null ? '--' : Math.round(number).toLocaleString('en-GB')}`);
     } else output.textContent = metric.value;
     card.querySelector('.telem-sub').textContent = metric.hint;
   }
@@ -263,12 +278,13 @@ function render(snapshot) {
   const after = snapshot.after_run || {};
   const mapped = mapState(snapshot);
   const ring = ringState(snapshot);
+  const bar = chamberBar(snapshot, ring);
   $('app').dataset.running = String(running);
   $('run-button-label').textContent = snapshot.stopping ? 'Stopping...' : running ? 'Running' : 'Start run';
   $('run-button').title = snapshot.status;
   $('run-time-state').textContent = snapshot.stopping ? 'stopping' : running ? 'running' : snapshot.stats ? 'last run' : 'press Start run';
-  $('session-stop-at').textContent = snapshot.settings.stop_after_minutes > 0 ? `${snapshot.settings.stop_after_minutes} min` : 'Off';
-  $('session-stop-level').textContent = snapshot.settings.stop_at_level > 0 ? snapshot.settings.stop_at_level.toLocaleString('en-GB') : 'Off';
+  const stopClock = clockTime(snapshot.settings.stop_at_seconds);
+  $('session-stop-at').textContent = snapshot.settings.stop_enabled ? (snapshot.settings.stop_at_seconds < 3600 ? stopClock.slice(3) : stopClock) : 'Off';
   $('session-note').textContent = !snapshot.stats ? 'Start a run to collect statistics. Level readings appear when available.' : running ? 'Current session. Rates use elapsed run time; level readings appear when available.' : `Latest run. ${snapshot.last_run?.reason || snapshot.status}`;
   $('mini-run').textContent = snapshot.stopping ? 'Stopping...' : running ? 'Stop' : 'Start';
   for (const id of ['run-button', 'mini-run']) {
@@ -283,15 +299,18 @@ function render(snapshot) {
   $('status').title = snapshot.status;
   $('mini-status').textContent = mapped.word;
   $('mini-status').title = snapshot.status;
-  $('run-time').textContent = ring.time;
-  telemetry.progress($('time-progress'), ring.empty ? null : ring.fraction, { scale: String(snapshot.settings.stop_after_minutes) });
+  $('time-left').textContent = ring.time;
+  $('time-left').classList.toggle('short-time', ring.time.length <= 5);
+  telemetry.progress($('time-progress'), ring.empty ? null : bar.fraction, { scale: snapshot.time_left <= 60 ? 'minute' : 'chamber' });
   $('mini-time').textContent = ring.time;
   $('mini-time').title = ring.description;
   $('gauge').classList.toggle('empty', ring.empty);
   $('gauge').dataset.tone = ring.tone;
-  $('gauge').setAttribute('aria-label', ring.description);
+  $('gauge').setAttribute('aria-label', bar.description);
   telemetry.progress($('mini-progress'), ring.empty ? null : ring.fraction);
   renderStats(snapshot.stats);
+  $('run-gravity').textContent = snapshot.settings.auto_gravity ? `${snapshot.settings.gravity}G` : 'Off';
+  $('run-gravity-hint').textContent = snapshot.settings.auto_gravity ? 'set at start' : 'not changed';
   $('mini-dot').classList.toggle('active', running);
   $('mini-dot').style.background = after.action ? 'var(--power)' : mapped.tone === 'warn' ? 'var(--warn)' : running ? 'var(--good)' : 'var(--text3)';
   $('set-window').disabled = running || busy || !online;
@@ -301,7 +320,7 @@ function render(snapshot) {
   $('window-hint').textContent = snapshot.window.correct ? 'Game area is ready.' : snapshot.window.found ? 'Not 1920 × 1080 yet. Starting a run fixes it, or click Set window.' : 'Open Roblox first.';
   $('settings-warning').hidden = !snapshot.settings_warning;
   $('settings-warning').textContent = snapshot.settings_warning || '';
-  $('version').textContent = snapshot.version || '1.0.1';
+  $('version').textContent = snapshot.version || '1.0.0';
   const action = after.action;
   $('after-banner').hidden = !action;
   $('mini-cancel').hidden = !action;

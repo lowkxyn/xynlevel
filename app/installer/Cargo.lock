@@ -2840,7 +2840,7 @@ dependencies = [
 
 [[package]]
 name = "xyn-installer"
-version = "1.0.1"
+version = "1.0.0"
 dependencies = [
  "rfd",
  "serde",

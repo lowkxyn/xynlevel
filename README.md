@@ -5,7 +5,7 @@
 <h1 align="center">XynLevel</h1>
 
 <p align="center">
-  Levels your <b>Dragon Generations</b> (DG, formerly Dragon Ball Online Generations / DBOG) character in the Gravity Chamber while you're away.<br>
+  Levels your <b>Dragon Generations</b> (DG, formerly Dragon Ball Online Generations / DBOG) character in the Gravity Chamber bot room while you're away.<br>
   Free, open source, Windows 10/11.
 </p>
 
@@ -19,22 +19,26 @@ https://github.com/user-attachments/assets/cd2ed2d1-334d-4f0c-bed8-a4577b30f484
 
 ## What it does
 
-You stand in the Gravity Chamber, press **F6**, and XynLevel trains for you. Since the Halloween 2026 update, the
-Chamber's EXP comes from its training minigames, multiplied by the gravity you train at (at 500G it's about x212),
-while that gravity drains your HP. XynLevel plays that loop:
+You stand in the Gravity Chamber bot room, press **F6**, and XynLevel plays the room for you until the
+chamber timer reaches the time you chose.
 
-- **Sets your gravity.** By default the highest gravity your account has unlocked, or a value you choose.
-- **Plays the Health training minigame.** It presses F whenever the marker is inside the gold zone.
-- **Eats Senzu beans.** When HP falls to the level you set, it stops training, eats the bean in item slot 1 and
-  carries on. It keeps a bean loaded by re-equipping one from your inventory while HP is full.
-- **Respawns** after a gravity death and walks back into the gravity field.
-- **Stops when you want:** after a run time, at a level, when your Senzu beans run out, or when the game sends
-  you out of the Chamber (its daily training limit). Then it can close itself or shut down the PC.
-- **Leaves you safe:** at the end of a run it puts gravity back to 1G, so an idle character doesn't drain.
+- **Charges and fires your ult.** It holds Shift to charge 4x Kamehameha, waits until the hotbar slot
+  lights up, fires, and repeats. It reads the Ki bar on screen, so it keeps up with any race or Ki
+  Control level instead of guessing timings.
+- **Ki blasts before you have an ult.** It locks on, fires Ki blasts and switches targets with the scroll
+  wheel. Auto mode uses the ult when there is one and blasts otherwise.
+- **Respawns on its own.** When you die it clicks Respawn and carries on. It also waits out loading
+  screens.
+- **Sets gravity** at the start of each run (100G by default).
+- **Can buy and equip 4x Kamehameha** while you're dead, once you're level 135 with 5,000 Zeni. It checks
+  your hotbar and owned moves first and only goes to the shop if you don't have it.
+- **Can spend skill points on Ki Control** while dead, up to a target you set.
+- **Stops on your timer,** then can close itself or shut down the PC (with a 30-second countdown you can
+  cancel).
 - **Sets the Roblox window up for you:** fullscreen on a 1080p screen, a centred 1920 x 1080 window on a
-  bigger one. It also closes Roblox's Performance Stats bar (Ctrl+F7) if it covers the level.
-- **Shows live stats:** run time, level and XP, Senzus eaten and left, deaths, gravity and EXP multiplier,
-  levels per hour and time to the next level.
+  bigger one.
+- **Shows live stats:** time left, run time, level and XP, ults, deaths, levels per hour, time to the next
+  level and more.
 - **Optional Discord reports** through your own webhook.
 
 <p align="center">
@@ -44,7 +48,7 @@ while that gravity drains your HP. XynLevel plays that loop:
 
 ## Install
 
-1. Download **`XynLevel_1.0.1_setup.exe`** from the
+1. Download **`XynLevel_1.0.0_setup.exe`** from the
    [latest release](https://github.com/lowkxyn/xynlevel/releases/latest).
 2. Run it and click **Install**. It installs for your Windows account only (to
    `%LOCALAPPDATA%\XynLevel`), so it doesn't need admin rights.
@@ -57,8 +61,7 @@ the bot is a packaged Python program that sends key presses. You can build it yo
 
 ## Quick start
 
-1. Open Roblox, join DG and go into the **Gravity Chamber** (the chamber itself, not the bot room). Have
-   Senzu beans in your inventory; XynLevel loads them into item slot 1 itself.
+1. Open Roblox, join DG and go into the **Gravity Chamber bot room**. Alive or dead is fine.
 2. Open XynLevel and look through **Settings**. The defaults work for most people.
 3. Click into Roblox so it's the active window, then press **F6**. Press **F6** again to stop.
 
@@ -85,33 +88,46 @@ Everything saves as you change it and applies to your next run.
 
 <p align="center"><img src="docs/app-settings.png" width="70%" alt="Settings page"></p>
 
-### Training
+### Attack
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| Gravity | Max unlocked | **Max unlocked** uses the highest gravity your account can set (it goes up with story quests). **Custom** uses the value you type, 1 to 500, capped at your maximum. |
+| Attack mode | Auto | **Auto** uses your ult when the slot has one, otherwise Ki blasts. **Blasts** only uses Ki blasts. **Ult** only uses the ult. |
+| Ult slot | 7 | Which hotbar slot holds your ult (7 or 8). Use a move that hits the whole room, like 4x Kamehameha. |
+| Blast interval | 0.4 s | Time between Ki blasts. |
+| Scroll interval | 1.0 s | Time between target switches while blasting. |
+| Jump when firing ults | Off | Runs, hops and fires in the air, then lands and charges again. |
+| Aim ults at the ceiling | On | Each life, zooms out and tilts the camera up before charging, so the ult hits more bots. |
 
-Higher gravity gives far more EXP but drains HP faster. On a level 1,250 character nothing changes up to about
-360G, then 400G drains about 100 HP/s for x8 EXP and 500G about 520 HP/s for x212.
-
-### Senzu
+### Movement (Ki blasts only)
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| Auto Senzu | On | Eats a Senzu bean when HP falls to the threshold, and keeps one loaded in item slot 1. |
-| Eat at HP | 35% | The HP level that triggers a bean. |
+| Movement | Circle | Off, W, W+A, W+D or Circle while blasting. Charging 4x Kamehameha always stands still. |
+| Sprint | On | Holds Shift while moving. |
+| Jump while blasting | On | Double hops every 1.2 to 2 s while firing. |
+| Re-lock now and then | On | Takes lock-on again every 8 to 15 s if switching targets stalls. |
 
-Item slot 1 is the only item slot XynLevel ever presses. Your other item slots are left alone.
+### Chamber
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| Auto gravity | On | Sets gravity once at the start of each run. |
+| Gravity | 100G | The gravity it sets. |
+| Hide chat | On | Keeps chat from covering the HP and Ki bars. |
+| Auto-buy 4x Kamehameha | Off | While dead, buys and equips it. Needs level 135 and 5,000 Zeni. Checks your hotbar and owned moves first. |
+| Replace slot move | Off | Lets it put 4x Kamehameha over another move in your ult slot. |
+| Put the old move back at the end | On | Re-equips the replaced move when the run ends. |
+| Spend skill points on Ki Control | Off | While dead, spends points on Ki Control until it reaches the target. **Spent points are permanent.** |
+| Ki Control output target | 300 | The Ki Control value to stop at. |
 
 ### Stopping
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| Stop after | 0 (off) | Ends the run after this many minutes. |
-| Stop at level | 0 (off) | Ends the run when you reach this level. |
-| After the run | Do nothing | Or **Close XynLevel**, or **Shut down PC**, after a run that reached its stop time or level. There's a 30-second countdown you can cancel. Windows shutdown is never forced. |
-
-A run also ends if your Senzu beans run out (with Auto Senzu on) or the game puts you outside the Chamber.
+| Stop at time left | Off | Ends the run when the chamber timer reaches your threshold. |
+| Threshold | 60 s | The time left to stop at. |
+| After reaching the threshold | Do nothing | Or **Close XynLevel**, or **Shut down PC**. There's a 30-second countdown you can cancel, and stopping by hand or an error skips it. Windows shutdown is never forced. |
 
 ### Appearance and notifications
 
@@ -126,15 +142,15 @@ In **Settings > Notifications**, paste a Discord webhook URL and click **Save**.
 - when a run finishes, is stopped, or needs attention (for example Roblox disconnected)
 - progress updates every 5 to 60 minutes while it runs, if you turn them on
 
-Reports only contain run counters: run time, level, levels gained, Senzus eaten and deaths. The webhook
+Reports only contain run counters: run time, level, deaths, ults, Ki blasts and time left. The webhook
 is encrypted for your Windows account, never shown again, and only ever sent to `discord.com`. **Send
 test** checks it works, and **Remove** deletes it.
 
 ## Stats
 
-The **Run** page shows run time, level and XP, Health training points left, Senzus eaten, deaths, and the
-gravity with its EXP multiplier. The **Stats** page adds levels gained, levels per hour, time to the next level,
-Senzus left and time paused.
+The **Run** page shows the chamber time left, run time, level and XP, ults fired, deaths and Ki blasts.
+The **Stats** page adds levels gained, levels per hour, time to the next level, ults per life, average
+life length and time paused.
 
 ## Privacy and safety
 
@@ -159,12 +175,11 @@ data** opens it).
 | --- | --- |
 | F6 does nothing | Click into Roblox first. F6 only starts a run while Roblox is the active window. |
 | "Roblox not found" | Open the Roblox desktop app and join the game before starting. |
-| "Not in the Gravity Chamber" | Go into the Chamber first. If its door says "You have trained enough, get some rest", the game's daily training limit is used up: try again after the wait it shows. |
-| "No Senzu beans left" | Get more, or turn Auto Senzu off and use a gravity you can survive. |
 | Window size is wrong | Click **Set window** on the Window page, or just start a run. On a display smaller than 1920 x 1080 it can't work. |
 | It pauses | Roblox lost focus. Click back into Roblox and it carries on. |
-| Level shows "--" | Install the English Windows OCR language pack (Settings > Time & language > Language). |
-| Keys seem stuck after a crash | Tap F, H and Ctrl. XynLevel releases them when it closes, even if the bot stops responding. |
+| No ults fire | Check the ult slot (7 or 8) in Settings and that the move is on that slot. Auto falls back to Ki blasts. |
+| Level shows "--" | Install the English Windows OCR language pack (Settings > Time & language > Language). The run works without it. |
+| Keys seem stuck after a crash | Tap Shift, W, A and D. XynLevel releases them when it closes, even if the bot stops responding. |
 
 ## Reporting a bug
 
@@ -199,8 +214,7 @@ screenshots, which aren't published, so those test files are skipped on a fresh 
 
 | Path | What's there |
 | --- | --- |
-| `gc_train.py` | The training loop: gravity, the Health minigame, Senzu, respawn |
-| `gc_*.py`, `window.py` | Screen reading, input helpers, window setup, and the older bot-room code |
+| `gc_*.py`, `window.py` | The bot: screen reading, charging, menus, aim, window setup |
 | `assets/` | Digit and menu templates the bot matches against |
 | `app/src/` | The app's UI (plain JavaScript) |
 | `app/python/` | The local bridge between the UI and the bot |

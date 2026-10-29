@@ -13,7 +13,7 @@ spec.loader.exec_module(prepare)
 
 class Resources(unittest.TestCase):
     def test_ui_is_self_contained_and_uses_app_branding(self):
-        page = prepare.render_ui("1.0.1")
+        page = prepare.render_ui("1.0.0")
         self.assertIn("#b4bbc8", page)
         self.assertIn("XYNLEVEL", page)
         self.assertIn("data:image/png;base64,", page)
@@ -23,8 +23,8 @@ class Resources(unittest.TestCase):
         self.assertNotIn("licenceButton", page)
 
     def test_backend_metadata_and_digest(self):
-        source = HERE.parent / "src-tauri/target/release/bundle/nsis/XynLevel_1.0.1_x64-setup.exe"
-        receipt = prepare.check_backend(source, "1.0.1")
+        source = HERE.parent / "src-tauri/target/release/bundle/nsis/XynLevel_1.0.0_x64-setup.exe"
+        receipt = prepare.check_backend(source, "1.0.0")
         self.assertEqual(len(receipt["sha256"]), 64)
         self.assertEqual(receipt["backend"], source.name)
         self.assertNotIn(str(HERE.parent), str(receipt))
@@ -35,7 +35,7 @@ class Resources(unittest.TestCase):
 
     def test_output_outside_work_is_rejected_before_writing(self):
         with self.assertRaises(ValueError):
-            prepare.prepare(HERE.parent / "dist", None, "1.0.1")
+            prepare.prepare(HERE.parent / "dist", None, "1.0.0")
 
     def test_invalid_resource_versions_are_rejected_before_writing(self):
         for version in ["0.1", "1.0.0/extra", "65536.0.0", "1.2.-1"]:

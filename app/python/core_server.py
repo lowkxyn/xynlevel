@@ -10,9 +10,9 @@ import hmac
 import json
 import logging
 from logging.handlers import RotatingFileHandler
-import math
 import os
 from pathlib import Path
+import re
 import threading
 import time
 from collections import deque
@@ -23,17 +23,17 @@ from privacy import scrub
 from settings import CORE_KEYS, SettingsStore
 from webhook import Webhook, classify
 
-VERSION = "1.0.1"
+VERSION = "1.0.0"
 HEADER = "X-XynLevel-Token"
 
 
 def load_core():
     if not getattr(sys, "frozen", False):
         sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-    import gc_train
+    import gc_bot
     import gc_vision
     import window
-    return gc_train, gc_vision, window
+    return gc_bot, gc_vision, window
 
 
 
@@ -56,7 +56,7 @@ class Bridge:
         self.bot = None
         self.stopped = threading.Event()
         self.stopped.set()
-        self.status = "Stand in the Gravity Chamber, then Start."
+        self.status = "Stand in the GC bot room (alive or dead), then Start."
         self.last_time = None
         self.run_id = 0
         self.last_run = None
@@ -137,20 +137,9 @@ class Bridge:
             self.bot = None
             self.stopped.set()
             self.set_status(reason)
+            completed = bool(re.fullmatch(r"Stopped: \d+s \(.+\) left", reason)) and bool(self.run_settings["stop_enabled"]) and not self.manual_stop and not self.closing
             kind, label = classify(reason, self.manual_stop or self.closing)
-            stats = getattr(self, "last_stats", None) or {}
-            settings = self.run_settings or {}
-            elapsed, level = stats.get("elapsed"), stats.get("level")
-            time_reached = (settings.get("stop_after_minutes", 0) > 0
-                            and type(elapsed) in (int, float) and math.isfinite(elapsed)
-                            and elapsed >= settings["stop_after_minutes"] * 60)
-            level_reached = (settings.get("stop_at_level", 0) > 0
-                             and type(level) in (int, float) and math.isfinite(level)
-                             and level >= settings["stop_at_level"])
-            completed = bool(time_reached or level_reached) and kind == "completed" and not self.manual_stop and not self.closing
-            if completed:
-                kind, label = "completed", "Reached the stop time" if time_reached else "Reached the target level"
-            self.webhook.send(kind, label, stats)
+            self.webhook.send(kind, label, getattr(self, "last_stats", None), self.last_time)
             self.last_run = {"id": self.run_id, "reason": self.status, "completed": completed}
             if completed:
                 self.pending_action = self.run_settings["after_run"] if self.run_settings["after_run"] != "none" else None
@@ -161,12 +150,10 @@ class Bridge:
 
     @staticmethod
     def _stats(bot):
-        """Add elapsed seconds without inventing missing training readings."""
+        """Run counters for the UI: elapsed seconds, deaths, ults fired, ki blasts."""
         stats = dict(getattr(bot, "stats", {}) or {})
         started = stats.pop("started", None)
-        stats["elapsed"] = None
-        if type(started) in (int, float) and math.isfinite(started) and started >= 0:
-            stats["elapsed"] = max(0, int(time.time() - started))
+        stats["elapsed"] = int(time.time() - started) if started else 0
         return stats
 
     def window_state(self):
@@ -296,7 +283,7 @@ class Bridge:
         bot = self.bot
         # No "still levelling" while the bot is paused or can't see the game.
         if bot and not str(self.status).startswith(("Paused", "Waiting")):
-            self.webhook.maybe_progress(self._stats(bot))
+            self.webhook.maybe_progress(self._stats(bot), bot.time_left)
         with self.lock:
             if not self.pending_action or time.monotonic() < self.action_deadline or self.closing:
                 return None

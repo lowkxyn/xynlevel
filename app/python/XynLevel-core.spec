@@ -10,7 +10,7 @@ analysis = Analysis(
     pathex=[str(HERE), str(CORE)],
     binaries=[],
     datas=[(str(CORE / "assets"), "assets")],
-    hiddenimports=["gc_train", "gc_bot", "gc_vision", "gc_gravity", "gc_menu", "gc_read", "gc_aim", "gc_stats", "window", "pynput.keyboard._win32", "pynput.mouse._win32",
+    hiddenimports=["gc_bot", "gc_vision", "gc_gravity", "gc_menu", "gc_read", "gc_aim", "gc_stats", "window", "pynput.keyboard._win32", "pynput.mouse._win32",
                    # Windows' built-in OCR (gc_read): the winrt projections are separate packages.
                    "winrt.runtime", "winrt.windows.foundation", "winrt.windows.foundation.collections",
                    "winrt.windows.globalization", "winrt.windows.graphics.imaging",
